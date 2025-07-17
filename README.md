@@ -1,4 +1,4 @@
-# CommonLibSSE-NG Plugin Template
+# <Placeholder>
 
 This is a basic plugin template using CommonLibSSE-NG.
 
@@ -8,8 +8,8 @@ This is a basic plugin template using CommonLibSSE-NG.
 
 ## Getting Started
 ```bat
-git clone --recurse-submodules https://github.com/enneal497/commonlibsse-ng-template
-cd commonlibsse-ng-template
+git clone --recurse-submodules https://github.com/enneal497/Newspapers
+cd Newspapers
 ```
 
 ### Setup
