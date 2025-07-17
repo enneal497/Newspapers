@@ -1,4 +1,4 @@
-# <Placeholder>
+# Placeholder
 
 This is a basic plugin template using CommonLibSSE-NG.
 
