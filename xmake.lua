@@ -6,7 +6,7 @@ includes("lib/commonlibsse-ng")
 includes("lib/CLibUtil")
 
 -- set project
-set_project("__plugin_name__")
+set_project("Newspapers")
 set_version("0.0.0")
 set_license("GPL-3.0")
 
@@ -28,7 +28,7 @@ add_rules("plugin.vsxmake.autoupdate")
 add_requires("rapidjson", "xbyak", "simpleini")
 
 -- targets
-target("__plugin_name__")
+target("Newspapers")
     -- add dependencies to target
     add_deps("commonlibsse-ng", "CLibUtil")
 
@@ -37,7 +37,7 @@ target("__plugin_name__")
 
     -- add commonlibsse-ng plugin
     add_rules("commonlibsse-ng.plugin", {
-        name = "__plugin_name__",
+        name = "Newspapers",
         author = "Enneal",
         description = "SKSE64 plugin template using CommonLibSSE-NG"
     })

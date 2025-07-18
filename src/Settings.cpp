@@ -8,7 +8,7 @@ namespace Settings
 
         CSimpleIniA ini;
         ini.SetUnicode();
-        ini.LoadFile(R"(.\Data\SKSE\Plugins\__plugin_name__.ini)");
+        ini.LoadFile(R"(.\Data\SKSE\Plugins\Newspapers.ini)");
 
         //Load global settings
         clib_util::ini::get_value(ini, debug_logging, "General", "bDebug");
