@@ -1,11 +1,12 @@
 #include "Settings.h"
-
+#include "LookupConfigs.h"
 
 void Listener(SKSE::MessagingInterface::Message* message) noexcept
 {
     if (message->type == SKSE::MessagingInterface::kDataLoaded) {
         Settings::LoadSettings();
         //Hooks::Install();
+        LookupConfigs::ReadConfigs();
     }
 }
 

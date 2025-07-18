@@ -27,10 +27,18 @@
             },
             version = "24.2.0"
         },
-        ["ninja#31fecfc4"] = {
+        ["glaze#31fecfc4"] = {
             repo = {
                 branch = "master",
                 commit = "b259080cbf7136520a516db478ab3dfb2aa0e941",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "v5.5.2"
+        },
+        ["ninja#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "9f939a599b254bd84c071d0724a2c4450e45ab36",
                 url = "https://github.com/xmake-io/xmake-repo.git"
             },
             version = "1.12.1"
@@ -42,14 +50,6 @@
                 url = "https://github.com/xmake-io/xmake-repo.git"
             },
             version = "v8.87"
-        },
-        ["rapidjson#31fecfc4"] = {
-            repo = {
-                branch = "master",
-                commit = "9e6a47e2910d598baa3311ff20ac85bfd161d0f7",
-                url = "https://github.com/xmake-io/xmake-repo.git"
-            },
-            version = "2025.02.05"
         },
         ["simpleini#31fecfc4"] = {
             repo = {

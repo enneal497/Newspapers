@@ -23,7 +23,7 @@ function main(plugin_name)
         return
     end
 
-    local config_old = path.join("config", "__plugin_name__.ini")
+    local config_old = path.join("config", "Newspapers.ini")
     local config_new = path.join("config", plugin_name .. ".ini")
 
     if os.exists(config_old) then

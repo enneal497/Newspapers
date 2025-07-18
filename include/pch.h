@@ -2,9 +2,13 @@
 
 #include <RE/Skyrim.h>
 #include <SKSE/SKSE.h>
+
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/msvc_sink.h>
 #include <CLIBUtil/utils.hpp>
+#include <glaze/glaze.hpp>
+
+#include <unordered_set>
 
 using namespace std::literals;
 

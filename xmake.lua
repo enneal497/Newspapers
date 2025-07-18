@@ -25,7 +25,7 @@ add_rules("mode.debug", "mode.releasedbg")
 add_rules("plugin.vsxmake.autoupdate")
 
 -- require packages
-add_requires("rapidjson", "xbyak", "simpleini")
+add_requires("glaze", "xbyak", "simpleini")
 
 -- targets
 target("Newspapers")
@@ -33,7 +33,7 @@ target("Newspapers")
     add_deps("commonlibsse-ng", "CLibUtil")
 
     -- add packages to target
-    add_packages("rapidjson", "xbyak", "simpleini")
+    add_packages("glaze", "xbyak", "simpleini")
 
     -- add commonlibsse-ng plugin
     add_rules("commonlibsse-ng.plugin", {
