@@ -7,7 +7,7 @@ namespace LookupConfigs
 		std::filesystem::path dir{ R"(Data\SKSE\Newspapers\Config\)" };
 		if (std::error_code ec; !std::filesystem::exists(dir, ec)) {
 			std::string error_message = ec.message();
-			logger::warn("Data/SKSE/Newspapers/Config not found ({})", error_message);
+			logger::critical("Data/SKSE/Newspapers/Config not found ({})", error_message);
 			return;
 		}
 
@@ -24,8 +24,7 @@ namespace LookupConfigs
 
 			if (ec) {
 				auto err = glz::format_error(ec, buffer);
-				logger::warn("Unable to read {}", filepath);
-				logger::warn("{}", err);
+				logger::error("{}", err);
 			}
 			else {
 				logger::info("Read {} entries", tmp_configs.size());
@@ -34,13 +33,13 @@ namespace LookupConfigs
 		}
 
 		logger::info("Read {} unique configs", existing_keys.size());
-
 	}
 
 	void AppendUniqueConfigs(std::vector<configFormat>& tmp_configs)
 	{
 		for (const auto& tmp_cfg : tmp_configs) {
 			if (existing_keys.insert(tmp_cfg.key).second) {
+				//Create and store Newspaper object instead by key in a map
 				configs.push_back(tmp_cfg);
 			}
 			else {

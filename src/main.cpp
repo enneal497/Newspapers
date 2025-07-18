@@ -5,7 +5,6 @@ void Listener(SKSE::MessagingInterface::Message* message) noexcept
 {
     if (message->type == SKSE::MessagingInterface::kDataLoaded) {
         Settings::LoadSettings();
-        //Hooks::Install();
         LookupConfigs::ReadConfigs();
     }
 }
@@ -24,6 +23,8 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
     if (const auto messaging{ SKSE::GetMessagingInterface() }; !messaging->RegisterListener(Listener)) {
         return false;
     }
+
+    //Add check for DBF dll
 
     logger::info("{} has finished loading.", name);
     logger::info("");
