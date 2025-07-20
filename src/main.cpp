@@ -1,11 +1,25 @@
 #include "Settings.h"
+#include "Utility.h"
 #include "LookupConfigs.h"
 
 void Listener(SKSE::MessagingInterface::Message* message) noexcept
 {
+    if (message->type == SKSE::MessagingInterface::kNewGame) {
+        Settings::IsNewGame = true;
+    }
     if (message->type == SKSE::MessagingInterface::kDataLoaded) {
         Settings::LoadSettings();
-        LookupConfigs::ReadConfigs();
+        
+        if (Settings::IsNewGame) {
+            //To avoid errors, only load configs on new game
+            //LookupConfigs::ReadConfigsFromFile();
+            Utility::TimeFunction("ReadConfigs", LookupConfigs::ReadConfigsFromFile);
+        }
+        else {
+            //Read from SKSE cosave
+        }
+        //Reset entries on startup regardless of state
+        //LookupEntries::ReadEntries();
     }
 }
 
@@ -24,7 +38,7 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
         return false;
     }
 
-    //Add check for DBF dll
+    //TODO: check for DBF dll
 
     logger::info("{} has finished loading.", name);
     logger::info("");

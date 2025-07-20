@@ -1,8 +1,9 @@
 #include "LookupConfigs.h"
+#include "DataManager.h"
 
 namespace LookupConfigs
 {
-	void ReadConfigs()
+	void ReadConfigsFromFile()
 	{
 		std::filesystem::path dir{ R"(Data\SKSE\Newspapers\Config\)" };
 		if (std::error_code ec; !std::filesystem::exists(dir, ec)) {
@@ -11,15 +12,17 @@ namespace LookupConfigs
 			return;
 		}
 
+		std::string buffer;
+		std::vector<configFormat> tmp_configs;
+		std::string filepath;
+
 		for (const auto& entry : std::filesystem::directory_iterator(dir)) {
 			if (entry.path().extension() != ".json"sv) {
 				continue;
 			}
-			std::string filepath = entry.path().string();
+			filepath = entry.path().string();
 			logger::info("Reading {}", filepath);
 
-			std::string buffer;
-			std::vector<configFormat> tmp_configs;
 			auto ec = glz::read_file_json(tmp_configs, filepath, buffer);
 
 			if (ec) {

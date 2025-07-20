@@ -4,6 +4,6 @@ namespace Settings
 {
     void LoadSettings() noexcept;
 
-    inline bool debug_logging = false;
+    inline bool IsNewGame = false;
 
 };
