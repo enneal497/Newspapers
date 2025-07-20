@@ -14,13 +14,12 @@ namespace LookupConfigs
 
 		std::string buffer;
 		std::vector<configFormat> tmp_configs;
-		std::string filepath;
 
 		for (const auto& entry : std::filesystem::directory_iterator(dir)) {
 			if (entry.path().extension() != ".json"sv) {
 				continue;
 			}
-			filepath = entry.path().string();
+			const std::string filepath = entry.path().string();
 			logger::info("Reading {}", filepath);
 
 			auto ec = glz::read_file_json(tmp_configs, filepath, buffer);
@@ -33,6 +32,9 @@ namespace LookupConfigs
 				logger::info("Read {} entries", tmp_configs.size());
 				AppendUniqueConfigs(tmp_configs);
 			}
+
+			buffer.clear();
+			tmp_configs.clear();
 		}
 
 		logger::info("Read {} unique configs", existing_keys.size());

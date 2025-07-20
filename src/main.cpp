@@ -4,22 +4,25 @@
 
 void Listener(SKSE::MessagingInterface::Message* message) noexcept
 {
-    if (message->type == SKSE::MessagingInterface::kNewGame) {
-        Settings::IsNewGame = true;
-    }
-    if (message->type == SKSE::MessagingInterface::kDataLoaded) {
+    switch (message->type) {
+    case SKSE::MessagingInterface::kDataLoaded:
         Settings::LoadSettings();
-        
-        if (Settings::IsNewGame) {
-            //To avoid errors, only load configs on new game
-            //LookupConfigs::ReadConfigsFromFile();
-            Utility::TimeFunction("ReadConfigs", LookupConfigs::ReadConfigsFromFile);
-        }
-        else {
-            //Read from SKSE cosave
-        }
+        break;
+
+    case SKSE::MessagingInterface::kNewGame:
+        //To avoid errors, only load configs on new game
+        //LookupConfigs::ReadConfigsFromFile();
+        Utility::TimeFunction("ReadConfigs", LookupConfigs::ReadConfigsFromFile);
+
         //Reset entries on startup regardless of state
         //LookupEntries::ReadEntries();
+        break;
+
+    case SKSE::MessagingInterface::kPostLoadGame:
+        //Read from SKSE cosave
+        //If no SKSE cosave found, run kNewGame functions
+        //LookupEntries::ReadEntries();
+        break;
     }
 }
 
