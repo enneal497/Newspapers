@@ -23,7 +23,6 @@ namespace LookupConfigs
 			logger::info("Reading {}", filepath);
 
 			auto ec = glz::read_file_json(tmp_configs, filepath, buffer);
-
 			if (ec) {
 				auto err = glz::format_error(ec, buffer);
 				logger::error("{}", err);
@@ -37,19 +36,18 @@ namespace LookupConfigs
 			tmp_configs.clear();
 		}
 
-		logger::info("Read {} unique configs", existing_keys.size());
+		logger::info("");
+		logger::info("Read {} unique configs", DataManager::newspaperMap.size());
 	}
 
 	void AppendUniqueConfigs(std::vector<configFormat>& tmp_configs)
 	{
-		for (const auto& tmp_cfg : tmp_configs) {
-			if (existing_keys.insert(tmp_cfg.key).second) {
-				//Create and store Newspaper object instead by key in a map
-				configs.push_back(tmp_cfg);
-			}
-			else {
-				logger::warn("Skipping {} - already exists", tmp_cfg.key);
-			}
+		for (const auto tmp_cfg : tmp_configs) {
+			auto result = DataManager::newspaperMap.emplace(
+				tmp_cfg.key,
+				tmp_cfg
+			);
+			if (!result.second) { logger::warn("{} skipped - already exists", tmp_cfg.key); }
 		}
 	}
 }

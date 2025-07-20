@@ -9,9 +9,6 @@ namespace LookupConfigs
 		std::vector<std::string> formlists;
 	};
 
-	static std::vector<configFormat> configs;
-	static std::unordered_set<std::string> existing_keys;
-
 	void ReadConfigsFromFile();
 	void AppendUniqueConfigs(std::vector<configFormat> &tmp_configs);
 
