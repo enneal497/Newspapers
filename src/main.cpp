@@ -19,8 +19,6 @@ void Listener(SKSE::MessagingInterface::Message* message) noexcept
         break;
 
     case SKSE::MessagingInterface::kPostLoadGame:
-        //Read from SKSE cosave
-        //If no SKSE cosave found, run kNewGame functions
         //LookupEntries::ReadEntries();
         break;
     }

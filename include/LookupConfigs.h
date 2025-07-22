@@ -7,6 +7,7 @@ namespace LookupConfigs
 		std::string bookName1;
 		std::string bookName2;
 		std::vector<std::string> formlists;
+		std::vector<std::string> containers;
 	};
 
 	void ReadConfigsFromFile();

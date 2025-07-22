@@ -17,7 +17,10 @@ namespace Utility
 	template<typename itemType>
 	itemType* GetFormFromID(std::string strID) {
 		//TODO: Add support for FormID~ModName.esp
-		auto form = RE::TESForm::LookupByEditorID<itemType>(strID);
+		const auto form = RE::TESForm::LookupByEditorID<itemType>(strID);
+		if (!RE::TESForm::LookupByEditorID(strID)) {
+			logger::info("{} not found as form", strID);
+		}
 		return form;
 	}
 }
