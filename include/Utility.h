@@ -15,12 +15,20 @@ namespace Utility
 	}
 
 	template<typename itemType>
-	itemType* GetFormFromID(std::string strID) {
-		//TODO: Add support for FormID~ModName.esp
-		const auto form = RE::TESForm::LookupByEditorID<itemType>(strID);
-		if (!RE::TESForm::LookupByEditorID(strID)) {
-			logger::info("{} not found as form", strID);
+	itemType* GetFormFromID(std::string formStr) {
+		auto formID = clib_util::string::split(formStr, "~");
+		
+		if (!clib_util::string::is_only_hex(formID[0])) {
+			return nullptr;
 		}
-		return form;
+
+		const auto intFormID = clib_util::string::to_num<RE::FormID>(formID[0], true);
+		const auto dataHandler = RE::TESDataHandler::GetSingleton();
+		auto form = dataHandler->LookupForm(intFormID, formID[1]);
+		if (!form) {
+			return nullptr;
+		}
+		return form->As<itemType>();		
+		
 	}
 }

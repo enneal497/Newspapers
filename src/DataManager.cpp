@@ -21,7 +21,7 @@ Newspaper::Newspaper(const LookupConfigs::configFormat &configData) {
 		auto container = Utility::GetFormFromID<RE::TESContainer>(formStr);
 		if (container) {
 			containers.push_back(container);
-			containerIDs.push_back(formStr);
+			//containerIDs.push_back(formPair);
 		}
 		else {
 			logger::warn("Skipping {} - container not found", formStr);
