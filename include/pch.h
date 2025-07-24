@@ -9,6 +9,7 @@
 #include <glaze/glaze.hpp>
 
 #include <unordered_set>
+#include <shared_mutex>
 
 using namespace std::literals;
 

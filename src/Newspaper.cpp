@@ -2,6 +2,8 @@
 #include "Utility.h"
 
 void Newspaper::AppendFormlists(std::vector<std::string> formlistIDs) {
+	if (!formlists.empty()) { return; }
+
 	//Get formlist pointers
 	for (auto formStr : formlistIDs) {
 		auto formlist = Utility::GetFormFromString<RE::BGSListForm>(formStr);
@@ -15,6 +17,8 @@ void Newspaper::AppendFormlists(std::vector<std::string> formlistIDs) {
 }
 
 void Newspaper::AppendContainers(std::vector<std::string> containerIDs) {
+	if (!containers.empty()) { return; }
+
 	//Get container pointers
 	for (auto formStr : containerIDs) {
 		auto container = Utility::GetFormFromString<RE::TESContainer>(formStr);

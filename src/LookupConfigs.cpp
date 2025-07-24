@@ -4,7 +4,7 @@
 
 namespace LookupConfigs
 {
-	void ReadConfigsFromFile()
+	void ReadConfigsFromFile(const bool bNewGame)
 	{
 		std::filesystem::path dir{ R"(Data\SKSE\Newspapers\Config\)" };
 		if (std::error_code ec; !std::filesystem::exists(dir, ec)) {
@@ -30,7 +30,7 @@ namespace LookupConfigs
 			}
 			else {
 				logger::info("Read {} entries", tmp_configs.size());
-				AppendUniqueConfigs(tmp_configs);
+				AppendUniqueConfigs(tmp_configs, bNewGame);
 			}
 
 			buffer.clear();
@@ -41,7 +41,7 @@ namespace LookupConfigs
 		logger::info("Read {} unique configs", DataManager::newspaperMap.size());
 	}
 
-	void AppendUniqueConfigs(std::vector<configFormat>& tmp_configs)
+	void AppendUniqueConfigs(std::vector<configFormat>& tmp_configs, const bool bNewGame)
 	{
 		for (const auto tmp_cfg : tmp_configs) {
 			auto bookID1 = Utility::GetFormFromString<RE::TESObjectBOOK>(tmp_cfg.bookID1);
@@ -55,14 +55,20 @@ namespace LookupConfigs
 				continue;
 			}
 
-			//Try to create Newspaper object
-			auto result = DataManager::newspaperMap.try_emplace(tmp_cfg.key, bookID1, bookID2);
-			if (!result.second) { 
-				logger::warn("{} skipped - already exists", tmp_cfg.key); 
+			if (bNewGame) {
+				//Try to create Newspaper object
+				auto result = DataManager::newspaperMap.try_emplace(tmp_cfg.key, bookID1, bookID2);
+				if (!result.second) {
+					logger::warn("{} skipped - already exists", tmp_cfg.key);
+					continue;
+				}
+				DataManager::newspaperMap.at(tmp_cfg.key).AppendFormlists(tmp_cfg.formlists);
+				DataManager::newspaperMap.at(tmp_cfg.key).AppendContainers(tmp_cfg.containers);
 			}
-
-			DataManager::newspaperMap.at(tmp_cfg.key).AppendFormlists(tmp_cfg.formlists);
-			DataManager::newspaperMap.at(tmp_cfg.key).AppendContainers(tmp_cfg.containers);
+			else if (DataManager::newspaperMap.contains(tmp_cfg.key)) {
+				DataManager::newspaperMap.at(tmp_cfg.key).AppendFormlists(tmp_cfg.formlists);
+				DataManager::newspaperMap.at(tmp_cfg.key).AppendContainers(tmp_cfg.containers);
+			}
 
 		}
 	}

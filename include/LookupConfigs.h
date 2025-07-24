@@ -11,7 +11,7 @@ namespace LookupConfigs
 	};
 
 
-	void ReadConfigsFromFile();
-	void AppendUniqueConfigs(std::vector<configFormat> &tmp_configs);
+	void ReadConfigsFromFile(const bool bNewGame);
+	void AppendUniqueConfigs(std::vector<configFormat> &tmp_configs, const bool bNewGame);
 
 }

@@ -18,23 +18,35 @@ namespace Serialisation
 	void InitialiseSerialisation()
 	{
 		logger::info("Initialising cosave serialisation");
-		const auto serialisation = SKSE::GetSerializationInterface();
-		serialisation->SetUniqueID(sUID);
-		serialisation->SetSaveCallback(OnGameSaved);
-		serialisation->SetLoadCallback(OnGameLoaded);
-		serialisation->SetRevertCallback(OnRevert);
+		const auto a_intfc = SKSE::GetSerializationInterface();
+		a_intfc->SetUniqueID(sUID);
+		a_intfc->SetSaveCallback(SaveCallback);
+		a_intfc->SetLoadCallback(LoadCallback);
+		a_intfc->SetRevertCallback(RevertCallback);
 		logger::info("Cosave serialisation initialized.");
 	}
 
+	void SaveCallback(SKSE::SerializationInterface* a_intfc) { 
+		Manager::GetSingleton()->OnGameSaved(a_intfc); 
+	}
+	void LoadCallback(SKSE::SerializationInterface* a_intfc) { 
+		Manager::GetSingleton()->OnGameLoaded(a_intfc); 
+	}
+	void RevertCallback(SKSE::SerializationInterface* a_intfc) { 
+		Manager::GetSingleton()->OnRevert(a_intfc); 
+	}
+
 	//Save contents of DataManager::newspaperMap
-	void OnGameSaved(SKSE::SerializationInterface* serialisation)
+	void Manager::OnGameSaved(SKSE::SerializationInterface* a_intfc)
 	{
+		std::scoped_lock<std::shared_mutex> locker(_lock);
+
 		logger::info("Saving data ...");
-		if (!serialisation->OpenRecord(sConfigs, sVersion)) {
+		if (!a_intfc->OpenRecord(sConfigs, sVersion)) {
 			logger::critical("Unable to open record sConfigs to write cosave data");
 			return;
 		}
-		if (!DataManager::SaveConfigData(serialisation)) {
+		if (!DataManager::SaveConfigData(a_intfc)) {
 			logger::critical("Failed to save data to cosave");
 			return;
 		}
@@ -44,20 +56,22 @@ namespace Serialisation
 	}
 
 	//Load cosave data to DataManager::newspaperMap
-	void OnGameLoaded(SKSE::SerializationInterface* serialisation)
+	void Manager::OnGameLoaded(SKSE::SerializationInterface* a_intfc)
 	{
+		std::scoped_lock<std::shared_mutex> locker(_lock);
+
 		logger::info("Loading data ...");
 		std::uint32_t type;
 		std::uint32_t version;
 		std::uint32_t length;
-		while (serialisation->GetNextRecordInfo(type, version, length)) {
+		while (a_intfc->GetNextRecordInfo(type, version, length)) {
 			if (version < sVersion) {
 				logger::critical("Cosave data is incompatible with this version of the mod.");
 				return;
 			}
 			//Load config data
 			if (type == sConfigs) {
-				if (!DataManager::LoadConfigData(serialisation)) {
+				if (!DataManager::LoadConfigData(a_intfc)) {
 					logger::critical("Failed to read data from cosave");
 					return;
 				}
@@ -69,8 +83,9 @@ namespace Serialisation
 		TestFunction();
 	}
 
-	void OnRevert(SKSE::SerializationInterface*)
+	void Manager::OnRevert(SKSE::SerializationInterface*)
 	{
+		std::scoped_lock<std::shared_mutex> locker(_lock);
 		DataManager::newspaperMap.clear();
 	}
 }
