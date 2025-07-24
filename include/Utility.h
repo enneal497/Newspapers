@@ -2,7 +2,7 @@
 
 namespace Utility
 {
-	void ReplaceBookContents(const std::string& bookTitle, const std::string& bookText);
+	void ReplaceBookContents(const RE::TESObjectBOOK* bookPtr, const std::string& bookText);
 
 	template<typename Func, typename... Args>
 	void TimeFunction(const std::string& funcName, Func func, Args&&... args) {
@@ -15,7 +15,7 @@ namespace Utility
 	}
 
 	template<typename itemType>
-	itemType* GetFormFromID(std::string formStr) {
+	itemType* GetFormFromString(std::string formStr) {
 		auto formID = clib_util::string::split(formStr, "~");
 		
 		if (!clib_util::string::is_only_hex(formID[0])) {

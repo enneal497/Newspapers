@@ -1,5 +1,6 @@
 #include "LookupConfigs.h"
 #include "DataManager.h"
+#include "Utility.h"
 
 namespace LookupConfigs
 {
@@ -43,11 +44,26 @@ namespace LookupConfigs
 	void AppendUniqueConfigs(std::vector<configFormat>& tmp_configs)
 	{
 		for (const auto tmp_cfg : tmp_configs) {
-			auto result = DataManager::newspaperMap.emplace(
-				tmp_cfg.key,
-				tmp_cfg
-			);
-			if (!result.second) { logger::warn("{} skipped - already exists", tmp_cfg.key); }
+			auto bookID1 = Utility::GetFormFromString<RE::TESObjectBOOK>(tmp_cfg.bookID1);
+			if (!bookID1) {
+				logger::warn("Book FormID {} is invalid", tmp_cfg.bookID1);
+				continue;
+			}
+			auto bookID2 = Utility::GetFormFromString<RE::TESObjectBOOK>(tmp_cfg.bookID2);
+			if (!bookID2) {
+				logger::warn("Book FormID {} is invalid", tmp_cfg.bookID2);
+				continue;
+			}
+
+			//Try to create Newspaper object
+			auto result = DataManager::newspaperMap.try_emplace(tmp_cfg.key, bookID1, bookID2);
+			if (!result.second) { 
+				logger::warn("{} skipped - already exists", tmp_cfg.key); 
+			}
+
+			DataManager::newspaperMap.at(tmp_cfg.key).AppendFormlists(tmp_cfg.formlists);
+			DataManager::newspaperMap.at(tmp_cfg.key).AppendContainers(tmp_cfg.containers);
+
 		}
 	}
 }

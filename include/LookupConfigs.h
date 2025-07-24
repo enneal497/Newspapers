@@ -4,8 +4,8 @@ namespace LookupConfigs
 {
 	struct configFormat {
 		std::string key;
-		std::string bookName1;
-		std::string bookName2;
+		std::string bookID1;
+		std::string bookID2;
 		std::vector<std::string> formlists;
 		std::vector<std::string> containers;
 	};

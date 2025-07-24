@@ -3,7 +3,7 @@
 
 namespace Utility
 {
-    void ReplaceBookContents(const std::string& bookTitle, const std::string& bookText)
+    void ReplaceBookContents(const RE::TESObjectBOOK* bookPtr, const std::string& bookText)
     {
         auto* messaging = SKSE::GetMessagingInterface();
         if (!messaging) {
@@ -12,7 +12,8 @@ namespace Utility
         }
         logger::debug("Dispatching message to DynamicBookFramework");
         DynamicBookFramework_API::OverwriteBookMessage message;
-        message.bookTitleKey = bookTitle.c_str();
+        //TODO - GetName() is untested, may not work as expected
+        message.bookTitleKey = bookPtr->GetName();
         message.newContent = bookText.c_str();
         messaging->Dispatch(
             DynamicBookFramework_API::kOverwriteBook,

@@ -1,5 +1,6 @@
 #include "Settings.h"
 #include "Utility.h"
+#include "Serialisation.h"
 #include "LookupConfigs.h"
 
 void Listener(SKSE::MessagingInterface::Message* message) noexcept
@@ -7,6 +8,7 @@ void Listener(SKSE::MessagingInterface::Message* message) noexcept
     switch (message->type) {
     case SKSE::MessagingInterface::kDataLoaded:
         Settings::LoadSettings();
+        Serialisation::InitialiseSerialisation();
         break;
 
     case SKSE::MessagingInterface::kNewGame:
@@ -38,8 +40,6 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
     if (const auto messaging{ SKSE::GetMessagingInterface() }; !messaging->RegisterListener(Listener)) {
         return false;
     }
-
-    //TODO: check for DBF dll
 
     logger::info("{} has finished loading.", name);
     logger::info("");
