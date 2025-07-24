@@ -1,5 +1,6 @@
 #include "Serialisation.h"
 #include "DataManager.h"
+#include "Utility.h"
 
 void TestFunction()
 {
@@ -70,11 +71,9 @@ namespace Serialisation
 				return;
 			}
 			//Load config data
-			if (type == sConfigs) {
-				if (!DataManager::LoadConfigData(a_intfc)) {
-					logger::critical("Failed to read data from cosave");
-					return;
-				}
+			if (type == sConfigs && !DataManager::LoadConfigData(a_intfc)) {
+				logger::critical("Failed to read data from cosave");
+				return;
 			}
 		}
 		logger::info("Finished loading data");

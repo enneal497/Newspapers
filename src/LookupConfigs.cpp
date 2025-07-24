@@ -43,7 +43,7 @@ namespace LookupConfigs
 
 	void AppendUniqueConfigs(std::vector<configFormat>& tmp_configs, const bool bNewGame)
 	{
-		for (const auto tmp_cfg : tmp_configs) {
+		for (const auto& tmp_cfg : tmp_configs) {
 			auto bookID1 = Utility::GetFormFromString<RE::TESObjectBOOK>(tmp_cfg.bookID1);
 			if (!bookID1) {
 				logger::warn("Book FormID {} is invalid", tmp_cfg.bookID1);
@@ -62,12 +62,16 @@ namespace LookupConfigs
 					logger::warn("{} skipped - already exists", tmp_cfg.key);
 					continue;
 				}
-				DataManager::newspaperMap.at(tmp_cfg.key).AppendFormlists(tmp_cfg.formlists);
-				DataManager::newspaperMap.at(tmp_cfg.key).AppendContainers(tmp_cfg.containers);
+
+				result.first->second.AppendFormlists(tmp_cfg.formlists);
+				result.first->second.AppendContainers(tmp_cfg.containers);
 			}
-			else if (DataManager::newspaperMap.contains(tmp_cfg.key)) {
-				DataManager::newspaperMap.at(tmp_cfg.key).AppendFormlists(tmp_cfg.formlists);
-				DataManager::newspaperMap.at(tmp_cfg.key).AppendContainers(tmp_cfg.containers);
+			else {
+				auto it = DataManager::newspaperMap.find(tmp_cfg.key);
+				if (it != DataManager::newspaperMap.end()) {
+					it->second.AppendFormlists(tmp_cfg.formlists);
+					it->second.AppendContainers(tmp_cfg.containers);
+				}
 			}
 
 		}
