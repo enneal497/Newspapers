@@ -2,6 +2,7 @@
 #include "Utility.h"
 #include "Serialisation.h"
 #include "LookupConfigs.h"
+#include "LookupEntries.h"
 
 void Listener(SKSE::MessagingInterface::Message* message) noexcept
 {
@@ -15,6 +16,8 @@ void Listener(SKSE::MessagingInterface::Message* message) noexcept
         //To avoid errors, only load configs on new game
         //LookupConfigs::ReadConfigsFromFile();
         Utility::TimeFunction("ReadConfigs", LookupConfigs::ReadConfigsFromFile, true);
+        //LookupEntries::ReadEntriesFromFile();
+        Utility::TimeFunction("ReadEntries", LookupEntries::ReadEntriesFromFile);
 
         //Reset entries on startup regardless of state
         //LookupEntries::ReadEntries();
