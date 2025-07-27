@@ -45,6 +45,11 @@ namespace LookupEntries
 	void AppendUniqueEntries(std::vector<entryFormat>& tmp_entries, auto& newspaper)
 	{
 		for (const auto& tmp_entry : tmp_entries) {
+			//Check if entry has been used already
+			auto textHash = clib_util::hash::fnv1a_32<std::string>(tmp_entry.value);
+			if (DataManager::usedEntrySet.contains(textHash)) {
+				continue;
+			}
 			//Check if entry is generic
 			if (!tmp_entry.conditions) {
 				Newspaper::genericEntry entry;

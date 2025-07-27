@@ -72,4 +72,40 @@ namespace DataManager
 
 		return true;
 	}
+
+	bool SaveEntryData(SKSE::SerializationInterface* a_intfc)
+	{
+		const std::size_t setSize = usedEntrySet.size();
+		if (!a_intfc->WriteRecordData(setSize)) {
+			logger::error("Failed to save set size");
+			return false;
+		}
+		for (auto& item : usedEntrySet) {
+			//Save item
+			if (!a_intfc->WriteRecordData(item)) {
+				logger::error("Failed to write hash {}", item);
+				return false;
+			}
+		}
+		return true;
+	}
+
+	bool LoadEntryData(SKSE::SerializationInterface* a_intfc)
+	{
+		std::size_t setSize;
+		a_intfc->ReadRecordData(&setSize, sizeof(setSize));
+		usedEntrySet.clear();
+
+		logger::info("Set size: {}", setSize);
+
+		if (setSize == 0) { return true; }
+
+		for (; setSize > 0; --setSize) {
+			uint32_t item;
+			a_intfc->ReadRecordData(&item, sizeof(item));
+		}
+		return true;
+
+	}
+
 }

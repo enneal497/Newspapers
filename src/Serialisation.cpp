@@ -5,8 +5,10 @@
 void TestFunction()
 {
 	logger::info("Testing serialisation success");
+	auto entrySize = DataManager::usedEntrySet.size();
+	logger::info("usedEntrySet size: {}", entrySize);
 	auto mapSize = DataManager::newspaperMap.size();
-	logger::info("Mapsize: {}", mapSize);
+	logger::info("Map size: {}", mapSize);
 	if (mapSize > 0) {
 		auto impMap = DataManager::newspaperMap.at("IMP");
 		auto contSize = impMap.GetContainers().size();
@@ -72,6 +74,10 @@ namespace Serialisation
 			}
 			//Load config data
 			if (type == sConfigs && !DataManager::LoadConfigData(a_intfc)) {
+				logger::critical("Failed to read data from cosave");
+				return;
+			}
+			else if (type == sEntries && !DataManager::LoadEntryData(a_intfc)) {
 				logger::critical("Failed to read data from cosave");
 				return;
 			}
