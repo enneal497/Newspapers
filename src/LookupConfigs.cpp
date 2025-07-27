@@ -37,8 +37,8 @@ namespace LookupConfigs
 			tmp_configs.clear();
 		}
 
-		logger::info("");
 		logger::info("Read {} unique configs", DataManager::newspaperMap.size());
+		logger::info("");
 	}
 
 	void AppendUniqueConfigs(std::vector<configFormat>& tmp_configs, const bool bNewGame)

@@ -12,6 +12,7 @@ namespace Utility
 		timer.end();
 		const auto runtime_us = timer.duration_us();
 		logger::info("{} ran in {} microseconds", funcName, runtime_us);
+		logger::info("");
 	}
 
 	template<typename itemType>
@@ -31,4 +32,6 @@ namespace Utility
 		return form->As<itemType>();		
 		
 	}
+
+	RE::FormID GetFormIDFromString(std::string formStr);
 }
