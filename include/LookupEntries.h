@@ -21,6 +21,6 @@ namespace LookupEntries
 	};
 
 	void ReadEntriesFromFile();
-	void AppendUniqueEntries(std::vector<entryFormat>& tmp_entries, auto& newspaper);
+	void AppendUniqueEntries(std::vector<entryFormat>& tmp_entries, Newspaper& newspaper);
 
 }

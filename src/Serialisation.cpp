@@ -62,24 +62,25 @@ namespace Serialisation
 	void Manager::OnGameLoaded(SKSE::SerializationInterface* a_intfc)
 	{
 		std::scoped_lock<std::shared_mutex> locker(_lock);
-
 		logger::info("Loading data ...");
-		std::uint32_t type;
-		std::uint32_t version;
-		std::uint32_t length;
+		std::uint32_t type, version, length;
+
 		while (a_intfc->GetNextRecordInfo(type, version, length)) {
 			if (version < sVersion) {
 				logger::critical("Cosave data is incompatible with this version of the mod.");
 				return;
 			}
-			//Load config data
-			if (type == sConfigs && !DataManager::LoadConfigData(a_intfc)) {
-				logger::critical("Failed to read data from cosave");
-				return;
+			if (type == sConfigs) {
+				if (!DataManager::LoadConfigData(a_intfc)) {
+					logger::critical("Failed to read data from cosave");
+					return;
+				}
 			}
-			else if (type == sEntries && !DataManager::LoadEntryData(a_intfc)) {
-				logger::critical("Failed to read data from cosave");
-				return;
+			else if (type == sEntries) {
+				if (!DataManager::LoadEntryData(a_intfc)) {
+					logger::critical("Failed to read data from cosave");
+					return;
+				}
 			}
 		}
 		logger::info("Finished loading data");

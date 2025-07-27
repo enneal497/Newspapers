@@ -56,7 +56,7 @@ namespace DataManager
 			}
 
 			auto bookOLD = RE::TESForm::LookupByID<RE::TESObjectBOOK>(bookID1);
-			auto bookNEW = RE::TESForm::LookupByID<RE::TESObjectBOOK>(bookID1);
+			auto bookNEW = RE::TESForm::LookupByID<RE::TESObjectBOOK>(bookID2);
 			if (!bookOLD || !bookNEW) { logger::warn("Failed to find book form"); continue; }
 
 			auto result = newspaperMap.try_emplace(key, bookOLD, bookNEW);
@@ -80,7 +80,7 @@ namespace DataManager
 			logger::error("Failed to save set size");
 			return false;
 		}
-		for (auto& item : usedEntrySet) {
+		for (const auto& item : usedEntrySet) {
 			//Save item
 			if (!a_intfc->WriteRecordData(item)) {
 				logger::error("Failed to write hash {}", item);
@@ -103,6 +103,7 @@ namespace DataManager
 		for (; setSize > 0; --setSize) {
 			uint32_t item;
 			a_intfc->ReadRecordData(&item, sizeof(item));
+			usedEntrySet.insert(item);
 		}
 		return true;
 
