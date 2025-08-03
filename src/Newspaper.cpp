@@ -46,7 +46,7 @@ void Newspaper::DistributeToContainers(std::vector<std::string> containerIDs)
 const std::string Newspaper::FormatNewEntry(const std::string& title, const std::string& value)
 {
 	//TEMPORARY
-	const std::string bookText = std::format("<font face='$HandwrittenFont'> {}\n\n{} </font>", title, value);
+	const std::string bookText = std::format("{}\n\n{}", title, value);
 	return bookText;
 }
 
@@ -63,7 +63,7 @@ void Newspaper::UpdateEntry()
 			const auto textHash = clib_util::hash::fnv1a_32<std::string>(cEntry.value);
 			DataManager::usedEntrySet.insert(textHash);
 			conditionedEntries.erase(it);
-			break;
+			return;
 		}
 	}
 
