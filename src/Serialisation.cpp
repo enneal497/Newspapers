@@ -1,7 +1,9 @@
 #include "Serialisation.h"
+#include "LookupEntries.h"
 #include "DataManager.h"
 #include "Utility.h"
 
+//Only for testing
 void TestFunction()
 {
 	logger::info("Testing serialisation success");
@@ -9,11 +11,7 @@ void TestFunction()
 	logger::info("usedEntrySet size: {}", entrySize);
 	auto mapSize = DataManager::newspaperMap.size();
 	logger::info("Map size: {}", mapSize);
-	if (mapSize > 0) {
-		auto impMap = DataManager::newspaperMap.at("IMP");
-		auto contSize = impMap.GetContainers().size();
-		logger::info("Container size: {}", contSize);
-	}
+	logger::info("");
 }
 
 namespace Serialisation
@@ -27,6 +25,7 @@ namespace Serialisation
 		a_intfc->SetLoadCallback(LoadCallback);
 		a_intfc->SetRevertCallback(RevertCallback);
 		logger::info("Cosave serialisation initialized.");
+		logger::info("");
 	}
 
 	void SaveCallback(SKSE::SerializationInterface* a_intfc) { 
@@ -54,8 +53,8 @@ namespace Serialisation
 			return;
 		}
 		logger::info("Finished saving data");
-		TestFunction();
 		logger::info("");
+		TestFunction();
 	}
 
 	//Load cosave data to DataManager::newspaperMap
@@ -83,8 +82,13 @@ namespace Serialisation
 				}
 			}
 		}
+
 		logger::info("Finished loading data");
 		logger::info("");
+
+		//Read entries from file after data is loaded
+		//LookupEntries::ReadEntriesFromFile();
+		Utility::TimeFunction("ReadEntries", LookupEntries::ReadEntriesFromFile);
 
 		TestFunction();
 	}

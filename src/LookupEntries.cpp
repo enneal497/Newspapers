@@ -13,13 +13,13 @@ namespace LookupEntries
 		for (const auto& [name, newspaper] : DataManager::newspaperMap) {
 			const std::string& key = "_" + name;
 			const auto& entries = clib_util::distribution::get_configs(dir, key, ".json");
-			logger::info("{} file(s) found for key {}", entries.size(), key);
+			logger::debug("{} file(s) found for key {}", entries.size(), key);
 
 			std::string buffer;
 			std::vector<entryFormat> tmp_entries;
 
 			for (const auto& filepath : entries) {
-				logger::info("Reading {}", filepath);
+				logger::debug("Reading {}", filepath);
 
 				auto ec = glz::read_file_json(tmp_entries, filepath, buffer);
 				if (ec) {
@@ -27,22 +27,27 @@ namespace LookupEntries
 					logger::error("{}", err);
 				}
 				else {
-					AppendUniqueEntries(tmp_entries, DataManager::newspaperMap.at(name));
+					ProcessUniqueEntries(tmp_entries, DataManager::newspaperMap.at(name));
 				}
 
 				buffer.clear();
 				tmp_entries.clear();
 			}
 
-			logger::info("{} generic and {} conditioned entries found", 
-				newspaper.genericEntries.size(), newspaper.conditionedEntries.size());
+			logger::info("{} generic and {} conditioned entries found for key {}", 
+				newspaper.genericEntries.size(), newspaper.conditionedEntries.size(), key);
 
 		}
 
 	}
 
-	void AppendUniqueEntries(std::vector<entryFormat>& tmp_entries, Newspaper& newspaper)
+	//Validate found entries
+	void ProcessUniqueEntries(std::vector<entryFormat>& tmp_entries, Newspaper& newspaper)
 	{
+		//Reset existing sets
+		newspaper.genericEntries.clear();
+		newspaper.conditionedEntries.clear();
+
 		for (const auto& tmp_entry : tmp_entries) {
 			//Check if entry has already been used
 			const auto textHash = clib_util::hash::fnv1a_32<std::string>(tmp_entry.value);

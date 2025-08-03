@@ -13,18 +13,12 @@ void Listener(SKSE::MessagingInterface::Message* message) noexcept
         break;
 
     case SKSE::MessagingInterface::kNewGame:
-        //To avoid errors, only load configs on new game
+        //Only load configs on new game
         //LookupConfigs::ReadConfigsFromFile();
         Utility::TimeFunction("ReadConfigs", LookupConfigs::ReadConfigsFromFile, true);
         //LookupEntries::ReadEntriesFromFile();
         Utility::TimeFunction("ReadEntries", LookupEntries::ReadEntriesFromFile);
 
-        //Reset entries on startup regardless of state
-        //LookupEntries::ReadEntries();
-        break;
-
-    case SKSE::MessagingInterface::kPostLoadGame:
-        //LookupEntries::ReadEntries();
         break;
     }
 }

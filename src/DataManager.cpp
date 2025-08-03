@@ -4,6 +4,7 @@
 
 namespace DataManager
 {
+	//Save newspaper config data
 	bool SaveConfigData(SKSE::SerializationInterface* a_intfc)
 	{
 		const std::size_t mapSize = newspaperMap.size();
@@ -18,14 +19,14 @@ namespace DataManager
 				return false;
 			}
 			//Save bookNames
-			if (!a_intfc->WriteRecordData(value.GetBookOLD()->GetFormID()) ||
-				!a_intfc->WriteRecordData(value.GetBookNEW()->GetFormID())) {
+			if (!a_intfc->WriteRecordData(value.GetBook()->GetFormID())) {
 				return false;
 			}
 		}
 		return true;
 	}
 
+	//Load all newspaper config data
 	bool LoadConfigData(SKSE::SerializationInterface* a_intfc)
 	{
 		std::size_t mapSize;
@@ -38,28 +39,21 @@ namespace DataManager
 
 		for (; mapSize > 0; --mapSize) {
 			std::string key;
-			RE::FormID bookID1;
-			RE::FormID bookID2;
+			RE::FormID bookID;
 
 			a_intfc->ReadRecordData(&key, sizeof(key));
-			a_intfc->ReadRecordData(&bookID1, sizeof(bookID1));
-			a_intfc->ReadRecordData(&bookID2, sizeof(bookID2));
+			a_intfc->ReadRecordData(&bookID, sizeof(bookID));
 
 			//Resolve formIDs
-			if (!a_intfc->ResolveFormID(bookID1, bookID1)) {
-				logger::warn("Failed to resolve formID {}", bookID1);
-				continue;
-			}
-			if (!a_intfc->ResolveFormID(bookID2, bookID2)) {
-				logger::warn("Failed to resolve formID {}", bookID2);
+			if (!a_intfc->ResolveFormID(bookID, bookID)) {
+				logger::warn("Failed to resolve formID {}", bookID);
 				continue;
 			}
 
-			auto bookOLD = RE::TESForm::LookupByID<RE::TESObjectBOOK>(bookID1);
-			auto bookNEW = RE::TESForm::LookupByID<RE::TESObjectBOOK>(bookID2);
-			if (!bookOLD || !bookNEW) { logger::warn("Failed to find book form"); continue; }
+			auto bookOBJ = RE::TESForm::LookupByID<RE::TESObjectBOOK>(bookID);
+			if (!bookOBJ) { logger::warn("Failed to find book form"); continue; }
 
-			auto result = newspaperMap.try_emplace(key, bookOLD, bookNEW);
+			auto result = newspaperMap.try_emplace(key, bookOBJ);
 			if (!result.second) {
 				logger::critical("Failed to read key");
 				return false;
@@ -73,6 +67,7 @@ namespace DataManager
 		return true;
 	}
 
+	//Save set of used entry hashes
 	bool SaveEntryData(SKSE::SerializationInterface* a_intfc)
 	{
 		const std::size_t setSize = usedEntrySet.size();
@@ -90,6 +85,7 @@ namespace DataManager
 		return true;
 	}
 
+	//Load set of used entry hashes
 	bool LoadEntryData(SKSE::SerializationInterface* a_intfc)
 	{
 		std::size_t setSize;
