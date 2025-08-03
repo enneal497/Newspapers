@@ -29,7 +29,6 @@ namespace Events
             return RE::BSEventNotifyControl::kContinue;
         }
 
-        logger::info("Player changed cells");
         const auto daysPassed = RE::Calendar::GetSingleton()->GetDaysPassed();
         logger::info("daysPassed: {}", daysPassed);
 
@@ -38,6 +37,7 @@ namespace Events
                 //Update newspaper entries
                 logger::info("Updating entry for {}", key);
                 newspaper.lastUpdatedDay = daysPassed;
+                newspaper.UpdateEntry();
             }
         }
 

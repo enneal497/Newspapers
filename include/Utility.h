@@ -1,9 +1,8 @@
 ﻿#pragma once
+#include "Newspaper.h"
 
 namespace Utility
 {
-	void ReplaceBookContents(const RE::TESObjectBOOK* bookPtr, const std::string& bookText);
-
 	template<typename Func, typename... Args>
 	void TimeFunction(const std::string& funcName, Func func, Args&&... args) {
 		clib_util::Timer timer;
@@ -32,6 +31,10 @@ namespace Utility
 		return form->As<itemType>();		
 		
 	}
+
+	int GetCWAllegiance();
+	bool ValidateQuestCondition(Newspaper::conditionFormat condition);
+	void ReplaceBookContents(const RE::TESObjectBOOK* bookPtr, const std::string& bookText);
 
 	RE::FormID GetFormIDFromString(std::string formStr);
 }

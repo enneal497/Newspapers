@@ -23,7 +23,8 @@ namespace Utility
         );
     }
 
-    RE::FormID GetFormIDFromString(std::string formStr) {
+    RE::FormID GetFormIDFromString(std::string formStr) 
+    {
         auto formPair = clib_util::string::split(formStr, "~");
 
         if (!clib_util::string::is_only_hex(formPair[0])) {
@@ -38,4 +39,33 @@ namespace Utility
         }
         return formID;
     }
+
+    int GetCWAllegiance()
+    {
+        const auto gAllegiance = RE::TESForm::LookupByEditorID<RE::TESGlobal>("CWPlayerAllegiance");
+        if (gAllegiance) {
+            return static_cast<int>(gAllegiance->value);
+        }
+        else {
+            return 0;
+        }
+    }
+
+    bool ValidateQuestCondition(Newspaper::conditionFormat condition)
+    {
+        const auto quest = RE::TESForm::LookupByID<RE::TESQuest>(condition.formID);
+        if (!quest) { return false; }
+
+        const auto questStage = quest->currentStage;
+        logger::info("Quest '{}' is on stage {}", quest->GetName(), questStage);
+
+        switch (condition.op) {
+        case '=': return questStage == condition.value;
+        case '<': return questStage < condition.value;
+        case '>': return questStage >= condition.value;
+        }
+
+        return false;
+    }
+
 }

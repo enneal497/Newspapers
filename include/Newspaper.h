@@ -1,6 +1,5 @@
 #pragma once
 
-
 class Newspaper
 {
 private:
@@ -16,7 +15,7 @@ public:
 	float lastUpdatedDay = 0;
 
 	struct conditionFormat {
-		RE::FormID var;
+		RE::FormID formID;
 		char op;
 		int value;
 	};
@@ -35,6 +34,8 @@ public:
 	std::vector<conditionedEntry> conditionedEntries;
 
 	void DistributeToContainers(std::vector<std::string> containerIDs);
+	const std::string FormatNewEntry(const std::string& title, const std::string& value);
+	void UpdateEntry();
 
 	const RE::TESObjectBOOK* GetBook() { return bookOBJ; }
 };
