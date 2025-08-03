@@ -7,9 +7,13 @@ private:
 	RE::TESObjectBOOK* bookOBJ;
 
 public:
-	Newspaper(RE::TESObjectBOOK* tmp_book)
-		: bookOBJ(tmp_book) {
+	Newspaper(RE::TESObjectBOOK* tmp_book, float tmp_updateInterval)
+		: bookOBJ(tmp_book),
+		updateInterval(tmp_updateInterval) {
 	}
+
+	float updateInterval;
+	float lastUpdatedDay = 0;
 
 	struct conditionFormat {
 		RE::FormID var;

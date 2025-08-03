@@ -18,6 +18,9 @@ namespace DataManager
 				logger::error("Failed to write key {}", key);
 				return false;
 			}
+			if (!a_intfc->WriteRecordData(value.updateInterval)) {
+				return false;
+			}
 			//Save bookNames
 			if (!a_intfc->WriteRecordData(value.GetBook()->GetFormID())) {
 				return false;
@@ -39,9 +42,11 @@ namespace DataManager
 
 		for (; mapSize > 0; --mapSize) {
 			std::string key;
+			float updateInterval;
 			RE::FormID bookID;
 
 			a_intfc->ReadRecordData(&key, sizeof(key));
+			a_intfc->ReadRecordData(&updateInterval, sizeof(updateInterval));
 			a_intfc->ReadRecordData(&bookID, sizeof(bookID));
 
 			//Resolve formIDs
@@ -53,7 +58,7 @@ namespace DataManager
 			auto bookOBJ = RE::TESForm::LookupByID<RE::TESObjectBOOK>(bookID);
 			if (!bookOBJ) { logger::warn("Failed to find book form"); continue; }
 
-			auto result = newspaperMap.try_emplace(key, bookOBJ);
+			auto result = newspaperMap.try_emplace(key, bookOBJ, updateInterval);
 			if (!result.second) {
 				logger::critical("Failed to read key");
 				return false;

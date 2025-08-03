@@ -1,5 +1,6 @@
 #include "Settings.h"
 #include "Utility.h"
+#include "Events.h"
 #include "Serialisation.h"
 #include "LookupConfigs.h"
 #include "LookupEntries.h"
@@ -8,7 +9,9 @@ void Listener(SKSE::MessagingInterface::Message* message) noexcept
 {
     switch (message->type) {
     case SKSE::MessagingInterface::kDataLoaded:
+        //Currently unused
         Settings::LoadSettings();
+        Events::CellEventHandler::Register();
         Serialisation::InitialiseSerialisation();
         break;
 

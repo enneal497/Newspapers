@@ -5,6 +5,7 @@ namespace LookupConfigs
 	struct configFormat {
 		std::string key;
 		std::string bookID;
+		float updateInterval;
 		std::vector<std::string> containers;
 	};
 

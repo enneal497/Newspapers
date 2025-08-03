@@ -52,12 +52,11 @@ namespace LookupConfigs
 
 			if (bNewGame) {
 				//Try to create Newspaper object
-				auto result = DataManager::newspaperMap.try_emplace(tmp_cfg.key, bookID);
+				auto result = DataManager::newspaperMap.try_emplace(tmp_cfg.key, bookID, tmp_cfg.updateInterval);
 				if (!result.second) {
 					logger::warn("{} skipped - already exists", tmp_cfg.key);
 					continue;
 				}
-
 				result.first->second.DistributeToContainers(tmp_cfg.containers);
 			}
 			else {
