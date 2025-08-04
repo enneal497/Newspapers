@@ -110,4 +110,20 @@ namespace DataManager
 
 	}
 
+	//Iterate through newspapers and update if required
+	void UpdateAllEntries(bool bForceUpdate)
+	{
+		const auto daysPassed = RE::Calendar::GetSingleton()->GetDaysPassed();
+		logger::info("daysPassed: {}", daysPassed);
+
+		for (auto& [key, newspaper] : newspaperMap) {
+			if (bForceUpdate || newspaper.lastUpdatedDay + newspaper.updateInterval < daysPassed) {
+				//Update newspaper entries
+				logger::info("Updating entry for {}", key);
+				newspaper.lastUpdatedDay = daysPassed;
+				newspaper.UpdateEntry();
+			}
+		}
+	}
+
 }

@@ -1,5 +1,6 @@
 #include "Events.h"
 #include "DataManager.h"
+#include "Utility.h"
 
 namespace Events
 {
@@ -29,17 +30,8 @@ namespace Events
             return RE::BSEventNotifyControl::kContinue;
         }
 
-        const auto daysPassed = RE::Calendar::GetSingleton()->GetDaysPassed();
-        logger::info("daysPassed: {}", daysPassed);
-
-        for (auto& [key, newspaper] : DataManager::newspaperMap) {
-            if (newspaper.lastUpdatedDay + newspaper.updateInterval < daysPassed) {
-                //Update newspaper entries
-                logger::info("Updating entry for {}", key);
-                newspaper.lastUpdatedDay = daysPassed;
-                newspaper.UpdateEntry();
-            }
-        }
+        //DataManager::UpdateAllEntries();
+        Utility::TimeFunction("UpdateAllEntries", DataManager::UpdateAllEntries, false);
 
         return RE::BSEventNotifyControl::kContinue;
     }

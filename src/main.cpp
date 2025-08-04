@@ -4,6 +4,7 @@
 #include "Serialisation.h"
 #include "LookupConfigs.h"
 #include "LookupEntries.h"
+#include "DataManager.h"
 
 void Listener(SKSE::MessagingInterface::Message* message) noexcept
 {
@@ -21,6 +22,7 @@ void Listener(SKSE::MessagingInterface::Message* message) noexcept
         Utility::TimeFunction("ReadConfigs", LookupConfigs::ReadConfigsFromFile, true);
         //LookupEntries::ReadEntriesFromFile();
         Utility::TimeFunction("ReadEntries", LookupEntries::ReadEntriesFromFile);
+        DataManager::UpdateAllEntries(true);
 
         break;
     }

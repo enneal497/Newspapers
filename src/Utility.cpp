@@ -5,14 +5,13 @@ namespace Utility
 {
     void ReplaceBookContents(const RE::TESObjectBOOK* bookPtr, const std::string& bookText)
     {
-        auto* messaging = SKSE::GetMessagingInterface();
+        static auto* messaging = SKSE::GetMessagingInterface();
         if (!messaging) {
             // SKSE not available
             return;
         }
         logger::debug("Dispatching message to DynamicBookFramework");
         DynamicBookFramework_API::OverwriteBookMessage message;
-        //TODO - GetName() is untested, may not work as expected
         message.bookTitleKey = bookPtr->GetName();
         message.newContent = bookText.c_str();
         messaging->Dispatch(
@@ -26,7 +25,6 @@ namespace Utility
     RE::FormID GetFormIDFromString(std::string formStr) 
     {
         auto formPair = clib_util::string::split(formStr, "~");
-
         if (!clib_util::string::is_only_hex(formPair[0])) {
             return 0;
         }
@@ -34,21 +32,15 @@ namespace Utility
         const auto intFormID = clib_util::string::to_num<RE::FormID>(formPair[0], true);
         const auto dataHandler = RE::TESDataHandler::GetSingleton();
         auto formID = dataHandler->LookupFormID(intFormID, formPair[1]);
-        if (!formID) {
-            return 0;
-        }
-        return formID;
+
+        return formID ? formID : 0;
     }
 
     int GetCWAllegiance()
     {
-        const auto gAllegiance = RE::TESForm::LookupByEditorID<RE::TESGlobal>("CWPlayerAllegiance");
-        if (gAllegiance) {
-            return static_cast<int>(gAllegiance->value);
-        }
-        else {
-            return 0;
-        }
+        //TEST IF THIS VALUE CHANGES DURING CW QUEST
+        static const RE::TESGlobal* gAllegiance = RE::TESForm::LookupByEditorID<RE::TESGlobal>("CWPlayerAllegiance");
+        return gAllegiance ? static_cast<int>(gAllegiance->value) : 0;
     }
 
     bool ValidateQuestCondition(Newspaper::conditionFormat condition)

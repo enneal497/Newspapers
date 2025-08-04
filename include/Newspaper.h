@@ -33,8 +33,8 @@ public:
 	std::vector<genericEntry> genericEntries;
 	std::vector<conditionedEntry> conditionedEntries;
 
-	void DistributeToContainers(std::vector<std::string> containerIDs);
-	const std::string FormatNewEntry(const std::string& title, const std::string& value);
+	void DistributeToContainers(const std::vector<std::string> containerIDs);
+	std::string FormatNewEntry(const std::string& title, const std::string& value);
 	void UpdateEntry();
 
 	const RE::TESObjectBOOK* GetBook() { return bookOBJ; }

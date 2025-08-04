@@ -27,7 +27,7 @@ bool TestConditions(const Newspaper::conditionedEntry& cEntry)
 }
 
 //Distribute newspaper base form to containers
-void Newspaper::DistributeToContainers(std::vector<std::string> containerIDs) 
+void Newspaper::DistributeToContainers(const std::vector<std::string> containerIDs) 
 {
 	for (auto formStr : containerIDs) {
 		auto container = Utility::GetFormFromString<RE::TESContainer>(formStr);
@@ -43,7 +43,7 @@ void Newspaper::DistributeToContainers(std::vector<std::string> containerIDs)
 }
 
 //Return formatted entry
-const std::string Newspaper::FormatNewEntry(const std::string& title, const std::string& value)
+std::string Newspaper::FormatNewEntry(const std::string& title, const std::string& value)
 {
 	//TEMPORARY
 	const std::string bookText = std::format("{}\n\n{}", title, value);
@@ -57,10 +57,10 @@ void Newspaper::UpdateEntry()
 	for (auto it = conditionedEntries.begin(); it != conditionedEntries.end(); ++it) {
 		const auto& cEntry = *it;
 		if (TestConditions(cEntry)) {
-			const auto& bookText = FormatNewEntry(cEntry.title, cEntry.value);
+			auto bookText = FormatNewEntry(cEntry.title, cEntry.value);
 			Utility::ReplaceBookContents(bookOBJ, bookText);
 
-			const auto textHash = clib_util::hash::fnv1a_32<std::string>(cEntry.value);
+			auto textHash = clib_util::hash::fnv1a_32<std::string>(cEntry.value);
 			DataManager::usedEntrySet.insert(textHash);
 			conditionedEntries.erase(it);
 			return;
@@ -68,12 +68,12 @@ void Newspaper::UpdateEntry()
 	}
 
 	//No valid conditioned entries found
-	if (genericEntries.size() == 0) { return; }
-	const auto index = clib_util::RNG().generate<std::size_t>(0, genericEntries.size() - 1);
+	if (genericEntries.empty()) { return; }
+	size_t index = clib_util::RNG().generate<std::size_t>(0, genericEntries.size() - 1);
 	logger::info("Got object at index {} of {}", index, genericEntries.size() - 1);
 
 	const auto& gEntry = genericEntries.at(index);
-	const auto& bookText = FormatNewEntry(gEntry.title, gEntry.value);
+	auto bookText = FormatNewEntry(gEntry.title, gEntry.value);
 	logger::info("Found entry {}", gEntry.title);
 	Utility::ReplaceBookContents(bookOBJ, bookText);
 
