@@ -3,17 +3,6 @@
 #include "DataManager.h"
 #include "Utility.h"
 
-//Only for testing
-void TestFunction()
-{
-	logger::info("Testing serialisation success");
-	auto entrySize = DataManager::usedEntrySet.size();
-	logger::info("usedEntrySet size: {}", entrySize);
-	auto mapSize = DataManager::newspaperMap.size();
-	logger::info("Map size: {}", mapSize);
-	logger::info("");
-}
-
 namespace Serialisation
 {
 	void InitialiseSerialisation()
@@ -43,7 +32,7 @@ namespace Serialisation
 	{
 		std::scoped_lock<std::shared_mutex> locker(_lock);
 
-		logger::info("Saving data ...");
+		logger::debug("Saving data ...");
 		if (!a_intfc->OpenRecord(sConfigs, sVersion)) {
 			logger::critical("Unable to open record sConfigs to write cosave data");
 			return;
@@ -52,9 +41,8 @@ namespace Serialisation
 			logger::critical("Failed to save data to cosave");
 			return;
 		}
-		logger::info("Finished saving data");
-		logger::info("");
-		TestFunction();
+		logger::debug("Finished saving data");
+		logger::debug("");
 	}
 
 	//Load cosave data to DataManager::newspaperMap
@@ -89,8 +77,6 @@ namespace Serialisation
 		//Read entries from file after data is loaded
 		//LookupEntries::ReadEntriesFromFile();
 		Utility::TimeFunction("ReadEntries", LookupEntries::ReadEntriesFromFile);
-
-		TestFunction();
 	}
 
 	void Manager::OnRevert(SKSE::SerializationInterface*)

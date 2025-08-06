@@ -34,7 +34,7 @@ public:
 	std::vector<conditionedEntry> conditionedEntries;
 
 	void DistributeToContainers(const std::vector<std::string> containerIDs);
-	std::string FormatNewEntry(const std::string& title, const std::string& value);
+	void PushNewEntry(const std::string& title, const std::string& value);
 	void UpdateEntry();
 
 	const RE::TESObjectBOOK* GetBook() { return bookOBJ; }

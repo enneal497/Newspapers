@@ -120,7 +120,7 @@ namespace DataManager
 			if (bForceUpdate || newspaper.lastUpdatedDay + newspaper.updateInterval < daysPassed) {
 				//Update newspaper entries
 				logger::info("Updating entry for {}", key);
-				newspaper.lastUpdatedDay = daysPassed;
+				if (!bForceUpdate) { newspaper.lastUpdatedDay = daysPassed; }
 				newspaper.UpdateEntry();
 			}
 		}

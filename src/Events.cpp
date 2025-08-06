@@ -30,6 +30,7 @@ namespace Events
             return RE::BSEventNotifyControl::kContinue;
         }
 
+
         //DataManager::UpdateAllEntries();
         Utility::TimeFunction("UpdateAllEntries", DataManager::UpdateAllEntries, false);
 

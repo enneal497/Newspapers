@@ -9,7 +9,7 @@ bool TestConditions(const Newspaper::conditionedEntry& cEntry)
 	const int CWAllegiance = Utility::GetCWAllegiance();
 
 	//Test player allegiance
-	if (cEntry.playerAllegiance && cEntry.playerAllegiance.value() == CWAllegiance) {
+	if (cEntry.playerAllegiance && cEntry.playerAllegiance.value() != CWAllegiance) {
 		logger::info("player allegiance {} doesn't match actual {}", cEntry.playerAllegiance.value(), CWAllegiance);
 		return false;
 	}
@@ -20,7 +20,7 @@ bool TestConditions(const Newspaper::conditionedEntry& cEntry)
 			return false;
 		}
 		//Valid condition
-		continue;
+		//continue;
 	}
 
 	return true;
@@ -36,18 +36,50 @@ void Newspaper::DistributeToContainers(const std::vector<std::string> containerI
 			continue;
 		}
 		
+		bool added = false;
+		int count = clib_util::RNG().generate<int>(1, 10);
 		const auto boundOBJ = bookOBJ->As<RE::TESBoundObject>();
-		container->RemoveObjectFromContainer(boundOBJ, 1);
-		container->AddObjectToContainer(boundOBJ, 1, nullptr);
+		
+		//If item is already in container, set new count
+		for (std::uint32_t i = 0; i < container->numContainerObjects; ++i) {
+			if (const auto entry = container->containerObjects[i]; entry && entry->obj == boundOBJ) {
+				entry->count = count;
+				added = true;
+				break;
+			}
+		}
+		if (!added) { container->AddObjectToContainer(boundOBJ, count, nullptr); }
 	}
 }
 
-//Return formatted entry
-std::string Newspaper::FormatNewEntry(const std::string& title, const std::string& value)
+//Format and replace with new text
+void Newspaper::PushNewEntry(const std::string& title, const std::string& value)
 {
 	//TEMPORARY
 	const std::string bookText = std::format("{}\n\n{}", title, value);
-	return bookText;
+	logger::info("Pushing new entry {}", title);
+
+	Utility::ReplaceBookContents(bookOBJ, bookText);
+	if (bookOBJ->IsRead()) {
+		bookOBJ->data.flags.reset(RE::OBJ_BOOK::Flag::kHasBeenRead);
+		bookOBJ->RemoveChange(RE::TESObjectBOOK::ChangeFlags::kRead);
+	}
+
+	//const auto boundOBJ = bookOBJ->As<RE::TESBoundObject>();
+	//static auto player = RE::PlayerCharacter::GetSingleton()->GetActorBase();
+
+	
+
+	/*
+	for (std::uint32_t i = 0; i < player->numContainerObjects; ++i) {
+		if (!player->containerObjects[i]) { continue; }
+		logger::info("Object {}", player->containerObjects[i]->obj->GetName());
+		if (const auto entry = player->containerObjects[i]; entry && entry->obj == boundOBJ) {
+			logger::info("Found newspaper {} in player inventory - OPT1", bookOBJ->GetName());
+			break;
+		}
+	}
+	*/
 }
 
 //Find next article
@@ -57,8 +89,7 @@ void Newspaper::UpdateEntry()
 	for (auto it = conditionedEntries.begin(); it != conditionedEntries.end(); ++it) {
 		const auto& cEntry = *it;
 		if (TestConditions(cEntry)) {
-			auto bookText = FormatNewEntry(cEntry.title, cEntry.value);
-			Utility::ReplaceBookContents(bookOBJ, bookText);
+			PushNewEntry(cEntry.title, cEntry.value);
 
 			auto textHash = clib_util::hash::fnv1a_32<std::string>(cEntry.value);
 			DataManager::usedEntrySet.insert(textHash);
@@ -73,8 +104,6 @@ void Newspaper::UpdateEntry()
 	logger::info("Got object at index {} of {}", index, genericEntries.size() - 1);
 
 	const auto& gEntry = genericEntries.at(index);
-	auto bookText = FormatNewEntry(gEntry.title, gEntry.value);
-	logger::info("Found entry {}", gEntry.title);
-	Utility::ReplaceBookContents(bookOBJ, bookText);
+	PushNewEntry(gEntry.title, gEntry.value);
 
 }
