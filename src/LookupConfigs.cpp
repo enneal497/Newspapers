@@ -4,12 +4,12 @@
 
 namespace LookupConfigs
 {
-	void ReadConfigsFromFile(const bool bNewGame)
+	void ReadConfigsFromFile()
 	{
-		std::filesystem::path dir{ R"(Data\SKSE\Newspapers\Config\)" };
+
 		if (std::error_code ec; !std::filesystem::exists(dir, ec)) {
 			std::string error_message = ec.message();
-			logger::critical("Data/SKSE/Newspapers/Config not found ({})", error_message);
+			//logger::critical("{} not found ({})", dir.c_str(), error_message);
 			return;
 		}
 
@@ -30,7 +30,7 @@ namespace LookupConfigs
 			}
 			else {
 				logger::debug("Reading {} entries", tmp_configs.size());
-				AppendUniqueConfigs(tmp_configs, bNewGame);
+				AppendUniqueConfigs(tmp_configs);
 			}
 
 			buffer.clear();
@@ -41,31 +41,17 @@ namespace LookupConfigs
 		logger::info("");
 	}
 
-	void AppendUniqueConfigs(std::vector<configFormat>& tmp_configs, const bool bNewGame)
+	void AppendUniqueConfigs(std::vector<configFormat>& tmp_configs)
 	{
 		for (const auto& tmp_cfg : tmp_configs) {
-			auto bookID = Utility::GetFormFromString<RE::TESObjectBOOK>(tmp_cfg.bookID);
-			if (!bookID) {
-				logger::warn("Book FormID {} is invalid", tmp_cfg.bookID);
+			//Try to create Newspaper object
+			auto result = DataManager::newspaperMap.try_emplace(tmp_cfg.key, tmp_cfg.updateInterval);
+			if (!result.second) {
+				logger::warn("{} skipped - already exists", tmp_cfg.key);
 				continue;
 			}
-
-			if (bNewGame) {
-				//Try to create Newspaper object
-				auto result = DataManager::newspaperMap.try_emplace(tmp_cfg.key, bookID, tmp_cfg.updateInterval);
-				if (!result.second) {
-					logger::warn("{} skipped - already exists", tmp_cfg.key);
-					continue;
-				}
-				result.first->second.DistributeToContainers(tmp_cfg.containers);
-			}
-			else {
-				auto it = DataManager::newspaperMap.find(tmp_cfg.key);
-				if (it != DataManager::newspaperMap.end()) {
-					it->second.DistributeToContainers(tmp_cfg.containers);
-				}
-			}
-
+			//result.first->second.ResolveContainers(std::move(tmp_cfg.containers));
+			result.first->second.ResolveContainers(tmp_cfg.containers);
 		}
 	}
 }

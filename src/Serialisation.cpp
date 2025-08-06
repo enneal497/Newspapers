@@ -1,8 +1,10 @@
 #include "Serialisation.h"
 #include "LookupEntries.h"
+#include "LookupConfigs.h"
 #include "DataManager.h"
 #include "Utility.h"
 
+//TODO Handle loading new installation on existring save
 namespace Serialisation
 {
 	void InitialiseSerialisation()
@@ -33,11 +35,11 @@ namespace Serialisation
 		std::scoped_lock<std::shared_mutex> locker(_lock);
 
 		logger::debug("Saving data ...");
-		if (!a_intfc->OpenRecord(sConfigs, sVersion)) {
-			logger::critical("Unable to open record sConfigs to write cosave data");
+		if (!a_intfc->OpenRecord(sEntries, sVersion)) {
+			logger::critical("Unable to open record sEntries to write cosave data");
 			return;
 		}
-		if (!DataManager::SaveConfigData(a_intfc)) {
+		if (!DataManager::SaveEntryData(a_intfc)) {
 			logger::critical("Failed to save data to cosave");
 			return;
 		}
@@ -57,13 +59,7 @@ namespace Serialisation
 				logger::critical("Cosave data is incompatible with this version of the mod.");
 				return;
 			}
-			if (type == sConfigs) {
-				if (!DataManager::LoadConfigData(a_intfc)) {
-					logger::critical("Failed to read data from cosave");
-					return;
-				}
-			}
-			else if (type == sEntries) {
+			if (type == sEntries) {
 				if (!DataManager::LoadEntryData(a_intfc)) {
 					logger::critical("Failed to read data from cosave");
 					return;
@@ -76,6 +72,8 @@ namespace Serialisation
 
 		//Read entries from file after data is loaded
 		//LookupEntries::ReadEntriesFromFile();
+		//LookupConfigs::ReadConfigsFromFile();
+		Utility::TimeFunction("ReadConfigs", LookupConfigs::ReadConfigsFromFile);
 		Utility::TimeFunction("ReadEntries", LookupEntries::ReadEntriesFromFile);
 	}
 

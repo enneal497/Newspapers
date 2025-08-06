@@ -29,7 +29,6 @@ namespace Serialisation
 	};
 
 	const unsigned long sUID = _byteswap_ulong('SNWS');
-	const unsigned long sConfigs = _byteswap_ulong('CNFG');
 	const unsigned long sEntries = _byteswap_ulong('ENTR');
 	const unsigned long sVersion = 1;
 

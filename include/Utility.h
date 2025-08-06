@@ -32,11 +32,10 @@ namespace Utility
 		
 	}
 
-	
-
 	int GetCWAllegiance();
 	bool ValidateQuestCondition(Newspaper::conditionFormat condition);
 	RE::FormID GetFormIDFromString(std::string formStr);
 	
+	//UNUSED
 	void ReplaceBookContents(const RE::TESObjectBOOK* bookPtr, const std::string& bookText);
 }

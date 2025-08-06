@@ -49,15 +49,20 @@ namespace LookupEntries
 
 		for (const auto& tmp_entry : tmp_entries) {
 			//Check if entry has already been used
-			const auto textHash = clib_util::hash::fnv1a_32<std::string>(tmp_entry.value);
-			if (DataManager::usedEntrySet.contains(textHash)) {
+			const auto tmp_formID = Utility::GetFormIDFromString(tmp_entry.bookID);
+			if (tmp_formID == 0) { 
+				logger::info("Unable to resolve formID {}", tmp_entry.bookID);
+				continue; 
+			}
+
+			if (DataManager::usedEntrySet.contains(tmp_formID)) {
 				continue;
 			}
 
 			//Generic entry (no conditions)
 			if (!tmp_entry.conditions) {
 				newspaper.genericEntries.emplace_back(
-					Newspaper::genericEntry{ tmp_entry.title, tmp_entry.value }
+					Newspaper::genericEntry{ tmp_formID }
 				);
 				continue;
 			}
@@ -74,14 +79,13 @@ namespace LookupEntries
 				}
 				else {
 					//Invalid condition
-					logger::warn("Invalid formID, skipping entry '{}'", tmp_entry.title);
+					logger::warn("Invalid formID, skipping entry '{}'", tmp_formID);
 					valid = false;
 					break;
 				}
 			}
 			if (valid) {
-				entry.title = tmp_entry.title;
-				entry.value = tmp_entry.value;
+				entry.formID = tmp_formID;
 				entry.playerAllegiance = tmp_entry.conditions->playerAllegiance;
 				newspaper.conditionedEntries.push_back(std::move(entry));
 			}

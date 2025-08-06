@@ -15,8 +15,7 @@ namespace LookupEntries
 		std::vector<std::tuple<std::string, char, int>> questStages;
 	};
 	struct entryFormat {
-		std::string title;
-		std::string value;
+		std::string bookID;
 		std::optional<entryConditionsFormat> conditions;
 	};
 

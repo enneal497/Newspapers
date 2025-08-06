@@ -2,13 +2,9 @@
 
 class Newspaper
 {
-private:
-	RE::TESObjectBOOK* bookOBJ;
-
 public:
-	Newspaper(RE::TESObjectBOOK* tmp_book, float tmp_updateInterval)
-		: bookOBJ(tmp_book),
-		updateInterval(tmp_updateInterval) {
+	Newspaper(float tmp_updateInterval)
+		: updateInterval(tmp_updateInterval) {
 	}
 
 	float updateInterval;
@@ -19,13 +15,13 @@ public:
 		char op;
 		int value;
 	};
+
+	//If nothing is added later, could be replaced by an std::vector<RE::FormID>
 	struct genericEntry {
-		std::string title;
-		std::string value;
+		RE::FormID formID;
 	};
 	struct conditionedEntry {
-		std::string title;
-		std::string value;
+		RE::FormID formID;
 		std::optional<int> playerAllegiance;
 		std::vector<conditionFormat> questStages;
 	};
@@ -33,9 +29,12 @@ public:
 	std::vector<genericEntry> genericEntries;
 	std::vector<conditionedEntry> conditionedEntries;
 
-	void DistributeToContainers(const std::vector<std::string> containerIDs);
-	void PushNewEntry(const std::string& title, const std::string& value);
+	RE::TESBoundObject* currentEntry;
+	std::vector<RE::TESContainer*> containerPtrs;
+
+	void ResolveContainers(const std::vector<std::string> containerIDs);
+	void UpdateContainers(RE::TESBoundObject* boundOBJ);
+	void PushNewEntry(RE::FormID formID);
 	void UpdateEntry();
 
-	const RE::TESObjectBOOK* GetBook() { return bookOBJ; }
 };

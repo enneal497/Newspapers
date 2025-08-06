@@ -16,7 +16,7 @@ namespace Utility
         if (!quest) { return false; }
 
         const auto questStage = quest->currentStage;
-        logger::info("Quest '{}' is on stage {}", quest->GetName(), questStage);
+        //logger::info("Quest '{}' is on stage {}", quest->GetName(), questStage);
 
         switch (condition.op) {
         case '=': return questStage == condition.value;
@@ -31,6 +31,7 @@ namespace Utility
     {
         auto formPair = clib_util::string::split(formStr, "~");
         if (!clib_util::string::is_only_hex(formPair[0])) {
+            logger::info("{} is not only hex", formPair[0]);
             return 0;
         }
 
@@ -42,6 +43,7 @@ namespace Utility
     }
 
     //Dispatch message to DynamicBookFramework
+    //UNUSED
     void ReplaceBookContents(const RE::TESObjectBOOK* bookPtr, const std::string& bookText)
     {
         static auto* messaging = SKSE::GetMessagingInterface();

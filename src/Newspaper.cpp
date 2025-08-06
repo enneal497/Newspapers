@@ -2,15 +2,15 @@
 #include "DataManager.h"
 #include "Utility.h"
 
-
+//Evaluate all entry conditions
 bool TestConditions(const Newspaper::conditionedEntry& cEntry)
 {
-	logger::info("Testing entry: '{}'", cEntry.title);
+	logger::info("Testing entry: '{}'", cEntry.formID);
 	const int CWAllegiance = Utility::GetCWAllegiance();
 
 	//Test player allegiance
 	if (cEntry.playerAllegiance && cEntry.playerAllegiance.value() != CWAllegiance) {
-		logger::info("player allegiance {} doesn't match actual {}", cEntry.playerAllegiance.value(), CWAllegiance);
+		//logger::info("player allegiance {} doesn't match actual {}", cEntry.playerAllegiance.value(), CWAllegiance);
 		return false;
 	}
 
@@ -26,8 +26,7 @@ bool TestConditions(const Newspaper::conditionedEntry& cEntry)
 	return true;
 }
 
-//Distribute newspaper base form to containers
-void Newspaper::DistributeToContainers(const std::vector<std::string> containerIDs) 
+void Newspaper::ResolveContainers(const std::vector<std::string> containerIDs)
 {
 	for (auto formStr : containerIDs) {
 		auto container = Utility::GetFormFromString<RE::TESContainer>(formStr);
@@ -35,51 +34,45 @@ void Newspaper::DistributeToContainers(const std::vector<std::string> containerI
 			logger::warn("Skipping {} - container not found", formStr);
 			continue;
 		}
-		
-		bool added = false;
-		int count = clib_util::RNG().generate<int>(1, 10);
-		const auto boundOBJ = bookOBJ->As<RE::TESBoundObject>();
-		
-		//If item is already in container, set new count
-		for (std::uint32_t i = 0; i < container->numContainerObjects; ++i) {
-			if (const auto entry = container->containerObjects[i]; entry && entry->obj == boundOBJ) {
-				entry->count = count;
-				added = true;
-				break;
-			}
-		}
-		if (!added) { container->AddObjectToContainer(boundOBJ, count, nullptr); }
+
+		containerPtrs.push_back(container);
+
 	}
 }
 
+//Distribute newspaper base form to containers
+void Newspaper::UpdateContainers(RE::TESBoundObject* boundOBJ)
+{
+	logger::info("Pushing to {} containers", containerPtrs.size());
+	for (auto container : containerPtrs) {
+		bool added = false;
+		int count = clib_util::RNG().generate<int>(1, 10);
+		
+		//If old item is in container, remove it
+		if (currentEntry) {
+			const auto currentCount = container->CountObjectsInContainer(currentEntry);
+			if (currentCount > 0) { container->RemoveObjectFromContainer(currentEntry, currentCount); }
+		}
+
+		container->AddObjectToContainer(boundOBJ, count, nullptr);
+	}
+
+}
+
 //Format and replace with new text
-void Newspaper::PushNewEntry(const std::string& title, const std::string& value)
+void Newspaper::PushNewEntry(RE::FormID formID)
 {
 	//TEMPORARY
-	const std::string bookText = std::format("{}\n\n{}", title, value);
-	logger::info("Pushing new entry {}", title);
+	logger::info("Pushing new entry {}", formID);
 
-	Utility::ReplaceBookContents(bookOBJ, bookText);
-	if (bookOBJ->IsRead()) {
-		bookOBJ->data.flags.reset(RE::OBJ_BOOK::Flag::kHasBeenRead);
-		bookOBJ->RemoveChange(RE::TESObjectBOOK::ChangeFlags::kRead);
-	}
+	auto boundOBJ = RE::TESForm::LookupByID<RE::TESBoundObject>(formID);
+	//RemoveFromContainers()
+	UpdateContainers(boundOBJ);
 
-	//const auto boundOBJ = bookOBJ->As<RE::TESBoundObject>();
-	//static auto player = RE::PlayerCharacter::GetSingleton()->GetActorBase();
-
-	
-
-	/*
-	for (std::uint32_t i = 0; i < player->numContainerObjects; ++i) {
-		if (!player->containerObjects[i]) { continue; }
-		logger::info("Object {}", player->containerObjects[i]->obj->GetName());
-		if (const auto entry = player->containerObjects[i]; entry && entry->obj == boundOBJ) {
-			logger::info("Found newspaper {} in player inventory - OPT1", bookOBJ->GetName());
-			break;
-		}
-	}
-	*/
+	//Reset current entry
+	currentEntry = boundOBJ;
+	logger::info("Pushed new entry");
+	logger::info("");
 }
 
 //Find next article
@@ -89,10 +82,9 @@ void Newspaper::UpdateEntry()
 	for (auto it = conditionedEntries.begin(); it != conditionedEntries.end(); ++it) {
 		const auto& cEntry = *it;
 		if (TestConditions(cEntry)) {
-			PushNewEntry(cEntry.title, cEntry.value);
+			PushNewEntry(cEntry.formID);
 
-			auto textHash = clib_util::hash::fnv1a_32<std::string>(cEntry.value);
-			DataManager::usedEntrySet.insert(textHash);
+			DataManager::usedEntrySet.insert(cEntry.formID);
 			conditionedEntries.erase(it);
 			return;
 		}
@@ -104,6 +96,6 @@ void Newspaper::UpdateEntry()
 	logger::info("Got object at index {} of {}", index, genericEntries.size() - 1);
 
 	const auto& gEntry = genericEntries.at(index);
-	PushNewEntry(gEntry.title, gEntry.value);
+	PushNewEntry(gEntry.formID);
 
 }

@@ -3,10 +3,10 @@
 
 namespace DataManager {
 	inline std::unordered_map<std::string, Newspaper> newspaperMap;
-	inline std::unordered_set<uint32_t> usedEntrySet;
+	inline std::unordered_set<RE::FormID> usedEntrySet;
 
-	bool SaveConfigData(SKSE::SerializationInterface* a_intfc);
-	bool LoadConfigData(SKSE::SerializationInterface* a_intfc);
+	const auto dir{ R"(Data\SKSE\Newspapers\)" };
+
 	bool SaveEntryData(SKSE::SerializationInterface* a_intfc);
 	bool LoadEntryData(SKSE::SerializationInterface* a_intfc);
 
