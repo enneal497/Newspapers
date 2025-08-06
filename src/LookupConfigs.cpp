@@ -6,6 +6,7 @@ namespace LookupConfigs
 {
 	void ReadConfigsFromFile()
 	{
+		//TODO - causes CTD if configDir is changed
 		if (std::error_code ec; !std::filesystem::exists(DataManager::configDir, ec)) {
 			std::string error_message = ec.message();
 			std::string pathStr = DataManager::configDir.string();
