@@ -34,6 +34,7 @@ namespace Utility
 
 	int GetCWAllegiance();
 	bool ValidateQuestCondition(Newspaper::conditionFormat condition);
+	bool TestConditions(const Newspaper::conditionedEntry& cEntry);
 	RE::FormID GetFormIDFromString(std::string formStr);
 	
 	//UNUSED

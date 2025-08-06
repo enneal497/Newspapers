@@ -6,10 +6,10 @@ namespace LookupConfigs
 {
 	void ReadConfigsFromFile()
 	{
-
-		if (std::error_code ec; !std::filesystem::exists(dir, ec)) {
+		if (std::error_code ec; !std::filesystem::exists(DataManager::configDir, ec)) {
 			std::string error_message = ec.message();
-			//logger::critical("{} not found ({})", dir.c_str(), error_message);
+			std::string pathStr = DataManager::configDir.string();
+			logger::critical("{} not found ({})", pathStr, error_message);
 			return;
 		}
 

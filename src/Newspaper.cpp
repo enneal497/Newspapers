@@ -2,29 +2,7 @@
 #include "DataManager.h"
 #include "Utility.h"
 
-//Evaluate all entry conditions
-bool TestConditions(const Newspaper::conditionedEntry& cEntry)
-{
-	logger::info("Testing entry: '{}'", cEntry.formID);
-	const int CWAllegiance = Utility::GetCWAllegiance();
 
-	//Test player allegiance
-	if (cEntry.playerAllegiance && cEntry.playerAllegiance.value() != CWAllegiance) {
-		//logger::info("player allegiance {} doesn't match actual {}", cEntry.playerAllegiance.value(), CWAllegiance);
-		return false;
-	}
-
-	//Evaluate all conditions using AND
-	for (const auto& condition : cEntry.questStages) {
-		if (!Utility::ValidateQuestCondition(condition)) {
-			return false;
-		}
-		//Valid condition
-		//continue;
-	}
-
-	return true;
-}
 
 void Newspaper::ResolveContainers(const std::vector<std::string> containerIDs)
 {
@@ -45,7 +23,7 @@ void Newspaper::UpdateContainers(RE::TESBoundObject* boundOBJ)
 {
 	logger::info("Pushing to {} containers", containerPtrs.size());
 	for (auto container : containerPtrs) {
-		bool added = false;
+		//TODO - Move min,max to DataManager.h
 		int count = clib_util::RNG().generate<int>(1, 10);
 		
 		//If old item is in container, remove it
@@ -62,11 +40,19 @@ void Newspaper::UpdateContainers(RE::TESBoundObject* boundOBJ)
 //Format and replace with new text
 void Newspaper::PushNewEntry(RE::FormID formID)
 {
-	//TEMPORARY
+	//TODO - Log as debug and convert formID to hex
 	logger::info("Pushing new entry {}", formID);
 
-	auto boundOBJ = RE::TESForm::LookupByID<RE::TESBoundObject>(formID);
-	//RemoveFromContainers()
+	const auto calendar = RE::Calendar::GetSingleton();
+	const auto dateStr = std::format("{}, {} {}, {}", 
+		calendar->GetDayName(), calendar->GetDay(), calendar->GetMonthName(), calendar->GetYear()
+	);
+
+	//TODO - Set format to "Newspaper_name - Date"
+	auto bookOBJ = RE::TESForm::LookupByID<RE::TESObjectBOOK>(formID);
+	bookOBJ->SetFullName(dateStr.c_str());
+
+	auto boundOBJ = bookOBJ->As<RE::TESBoundObject>();
 	UpdateContainers(boundOBJ);
 
 	//Reset current entry
@@ -81,7 +67,7 @@ void Newspaper::UpdateEntry()
 	//Evaluate all conditioned entries
 	for (auto it = conditionedEntries.begin(); it != conditionedEntries.end(); ++it) {
 		const auto& cEntry = *it;
-		if (TestConditions(cEntry)) {
+		if (Utility::TestConditions(cEntry)) {
 			PushNewEntry(cEntry.formID);
 
 			DataManager::usedEntrySet.insert(cEntry.formID);

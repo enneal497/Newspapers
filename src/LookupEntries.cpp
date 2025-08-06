@@ -6,12 +6,10 @@ namespace LookupEntries
 {
 	void ReadEntriesFromFile()
 	{
-		auto dir = R"(Data\SKSE\Newspapers\)";
-		
 		//Iterate over available keys
 		for (const auto& [name, newspaper] : DataManager::newspaperMap) {
 			const std::string& key = "_" + name;
-			const auto& entries = clib_util::distribution::get_configs(dir, key, ".json");
+			const auto& entries = clib_util::distribution::get_configs(DataManager::dir, key, ".json");
 			logger::debug("{} file(s) found for key {}", entries.size(), key);
 
 			std::string buffer;

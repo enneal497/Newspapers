@@ -3,9 +3,23 @@
 
 namespace Utility
 {
+    RE::FormID GetFormIDFromString(std::string formStr)
+    {
+        auto formPair = clib_util::string::split(formStr, "~");
+        if (!clib_util::string::is_only_hex(formPair[0])) {
+            logger::info("{} is not only hex", formPair[0]);
+            return 0;
+        }
+
+        const auto intFormID = clib_util::string::to_num<RE::FormID>(formPair[0], true);
+        const auto dataHandler = RE::TESDataHandler::GetSingleton();
+        auto formID = dataHandler->LookupFormID(intFormID, formPair[1]);
+
+        return formID ? formID : 0;
+    }
+
     int GetCWAllegiance()
     {
-        //TEST IF THIS VALUE CHANGES DURING CW QUEST
         static const RE::TESGlobal* gAllegiance = RE::TESForm::LookupByEditorID<RE::TESGlobal>("CWPlayerAllegiance");
         return gAllegiance ? static_cast<int>(gAllegiance->value) : 0;
     }
@@ -27,19 +41,28 @@ namespace Utility
         return false;
     }
 
-    RE::FormID GetFormIDFromString(std::string formStr)
+    //Evaluate all entry conditions
+    bool TestConditions(const Newspaper::conditionedEntry& cEntry)
     {
-        auto formPair = clib_util::string::split(formStr, "~");
-        if (!clib_util::string::is_only_hex(formPair[0])) {
-            logger::info("{} is not only hex", formPair[0]);
-            return 0;
+        logger::info("Testing entry: '{}'", cEntry.formID);
+        const int CWAllegiance = GetCWAllegiance();
+
+        //Test player allegiance
+        if (cEntry.playerAllegiance && cEntry.playerAllegiance.value() != CWAllegiance) {
+            //logger::info("player allegiance {} doesn't match actual {}", cEntry.playerAllegiance.value(), CWAllegiance);
+            return false;
         }
 
-        const auto intFormID = clib_util::string::to_num<RE::FormID>(formPair[0], true);
-        const auto dataHandler = RE::TESDataHandler::GetSingleton();
-        auto formID = dataHandler->LookupFormID(intFormID, formPair[1]);
+        //Evaluate all conditions using AND
+        for (const auto& condition : cEntry.questStages) {
+            if (!ValidateQuestCondition(condition)) {
+                return false;
+            }
+            //Valid condition
+            //continue;
+        }
 
-        return formID ? formID : 0;
+        return true;
     }
 
     //Dispatch message to DynamicBookFramework
