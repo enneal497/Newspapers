@@ -36,6 +36,7 @@ namespace Utility
 	bool ValidateQuestCondition(Newspaper::conditionFormat condition);
 	bool TestConditions(const Newspaper::conditionedEntry& cEntry);
 	RE::FormID GetFormIDFromString(std::string formStr);
+	bool ReadFormID(SKSE::SerializationInterface* a_intfc, RE::FormID& formID);
 	
 	//UNUSED
 	void ReplaceBookContents(const RE::TESObjectBOOK* bookPtr, const std::string& bookText);

@@ -18,6 +18,15 @@ namespace Utility
         return formID ? formID : 0;
     }
 
+    bool ReadFormID(SKSE::SerializationInterface* a_intfc, RE::FormID& formID)
+    {
+        a_intfc->ReadRecordData(formID);
+        if (formID != 0) {
+            return a_intfc->ResolveFormID(formID, formID);
+        }
+        return true;
+    }
+
     int GetCWAllegiance()
     {
         static const RE::TESGlobal* gAllegiance = RE::TESForm::LookupByEditorID<RE::TESGlobal>("CWPlayerAllegiance");

@@ -4,6 +4,7 @@ namespace LookupConfigs
 {
 	struct configFormat {
 		std::string key;
+		std::string name;
 		float updateInterval;
 		std::vector<std::string> containers;
 	};

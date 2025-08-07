@@ -19,7 +19,8 @@ void Listener(SKSE::MessagingInterface::Message* message) noexcept
         Utility::TimeFunction("ReadConfigs", LookupConfigs::ReadConfigsFromFile);
         //LookupEntries::ReadEntriesFromFile();
         Utility::TimeFunction("ReadEntries", LookupEntries::ReadEntriesFromFile);
-        DataManager::UpdateAllEntries(true);
+        //DataManager::UpdateAllEntries(true);
+        Utility::TimeFunction("UpdateAllEntries", DataManager::UpdateAllEntries, true);
 
         break;
     }

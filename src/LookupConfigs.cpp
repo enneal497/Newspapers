@@ -46,7 +46,7 @@ namespace LookupConfigs
 	{
 		for (const auto& tmp_cfg : tmp_configs) {
 			//Try to create Newspaper object
-			auto result = DataManager::newspaperMap.try_emplace(tmp_cfg.key, tmp_cfg.updateInterval);
+			auto result = DataManager::newspaperMap.try_emplace(tmp_cfg.key, tmp_cfg.name, tmp_cfg.updateInterval);
 			if (!result.second) {
 				logger::warn("{} skipped - already exists", tmp_cfg.key);
 				continue;

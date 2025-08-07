@@ -8,8 +8,10 @@ namespace DataManager {
 	const std::string_view dir{ R"(Data\SKSE\Newspapers\)" };
 	const std::filesystem::path configDir{ R"(Data\SKSE\Newspapers\Config)" };
 
-	bool SaveEntryData(SKSE::SerializationInterface* a_intfc);
-	bool LoadEntryData(SKSE::SerializationInterface* a_intfc);
+	bool SaveUsedEntries(SKSE::SerializationInterface* a_intfc);
+	bool LoadUsedEntries(SKSE::SerializationInterface* a_intfc);
+	bool SaveCurrentEntries(SKSE::SerializationInterface* a_intfc);
+	bool LoadCurrentEntries(SKSE::SerializationInterface* a_intfc);
 
 	void UpdateAllEntries(bool bForceUpdate = false);
 }

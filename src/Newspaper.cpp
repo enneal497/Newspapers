@@ -38,19 +38,25 @@ void Newspaper::UpdateContainers(RE::TESBoundObject* boundOBJ)
 }
 
 //Format and replace with new text
-void Newspaper::PushNewEntry(RE::FormID formID)
+void Newspaper::PushNewEntry(RE::FormID formID, bool bResetFlags)
 {
 	//TODO - Log as debug and convert formID to hex
 	logger::info("Pushing new entry {}", formID);
 
-	const auto calendar = RE::Calendar::GetSingleton();
+	auto bookOBJ = RE::TESForm::LookupByID<RE::TESObjectBOOK>(formID);
+	if (bResetFlags && bookOBJ->IsRead()) {
+		bookOBJ->data.flags.reset(RE::OBJ_BOOK::Flag::kHasBeenRead);
+		bookOBJ->RemoveChange(RE::TESObjectBOOK::ChangeFlags::kRead);
+	}
+	/*
+	static const auto calendar = RE::Calendar::GetSingleton();
 	const auto dateStr = std::format("{}, {} {}, {}", 
 		calendar->GetDayName(), calendar->GetDay(), calendar->GetMonthName(), calendar->GetYear()
 	);
+	const auto nameStr = newspaperName + " - " + dateStr;
 
-	//TODO - Set format to "Newspaper_name - Date"
-	auto bookOBJ = RE::TESForm::LookupByID<RE::TESObjectBOOK>(formID);
-	bookOBJ->SetFullName(dateStr.c_str());
+	bookOBJ->SetFullName(nameStr.c_str());
+	*/
 
 	auto boundOBJ = bookOBJ->As<RE::TESBoundObject>();
 	UpdateContainers(boundOBJ);
@@ -68,7 +74,7 @@ void Newspaper::UpdateEntry()
 	for (auto it = conditionedEntries.begin(); it != conditionedEntries.end(); ++it) {
 		const auto& cEntry = *it;
 		if (Utility::TestConditions(cEntry)) {
-			PushNewEntry(cEntry.formID);
+			PushNewEntry(cEntry.formID, false);
 
 			DataManager::usedEntrySet.insert(cEntry.formID);
 			conditionedEntries.erase(it);
@@ -82,6 +88,6 @@ void Newspaper::UpdateEntry()
 	logger::info("Got object at index {} of {}", index, genericEntries.size() - 1);
 
 	const auto& gEntry = genericEntries.at(index);
-	PushNewEntry(gEntry.formID);
+	PushNewEntry(gEntry.formID, true);
 
 }

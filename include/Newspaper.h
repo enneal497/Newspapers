@@ -2,9 +2,14 @@
 
 class Newspaper
 {
+private:
+	std::string newspaperName;
+
 public:
-	Newspaper(float tmp_updateInterval)
-		: updateInterval(tmp_updateInterval) {
+	Newspaper(std::string tmp_name, float tmp_updateInterval)
+		: updateInterval(tmp_updateInterval),
+		newspaperName(tmp_name),
+		currentEntry(nullptr) {
 	}
 
 	float updateInterval;
@@ -34,7 +39,7 @@ public:
 
 	void ResolveContainers(const std::vector<std::string> containerIDs);
 	void UpdateContainers(RE::TESBoundObject* boundOBJ);
-	void PushNewEntry(RE::FormID formID);
+	void PushNewEntry(RE::FormID formID, bool bResetFlags);
 	void UpdateEntry();
 
 };

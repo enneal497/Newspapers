@@ -35,12 +35,12 @@ namespace Serialisation
 		std::scoped_lock<std::shared_mutex> locker(_lock);
 
 		logger::debug("Saving data ...");
-		if (!a_intfc->OpenRecord(sEntries, sVersion)) {
-			logger::critical("Unable to open record sEntries to write cosave data");
+		if (!a_intfc->OpenRecord(sUsedEntries, sVersion) || !DataManager::SaveUsedEntries(a_intfc)) {
+			logger::critical("Unable to open record sUsedEntries to write cosave data");
 			return;
 		}
-		if (!DataManager::SaveEntryData(a_intfc)) {
-			logger::critical("Failed to save data to cosave");
+		if (!a_intfc->OpenRecord(sCurrentEntries, sVersion) || !DataManager::SaveCurrentEntries(a_intfc)) {
+			logger::critical("Failed to save sCurrentEntries data to cosave");
 			return;
 		}
 		logger::debug("Finished saving data");
@@ -53,15 +53,33 @@ namespace Serialisation
 		std::scoped_lock<std::shared_mutex> locker(_lock);
 		logger::info("Loading data ...");
 		std::uint32_t type, version, length;
+		bool bLoadedConfigs = false;
 
 		while (a_intfc->GetNextRecordInfo(type, version, length)) {
 			if (version < sVersion) {
 				logger::critical("Cosave data is incompatible with this version of the mod.");
 				return;
 			}
-			if (type == sEntries) {
-				if (!DataManager::LoadEntryData(a_intfc)) {
-					logger::critical("Failed to read data from cosave");
+			if (type == sUsedEntries) {
+				if (!DataManager::LoadUsedEntries(a_intfc)) {
+					logger::critical("Failed to read sUsedEntries data from cosave");
+					return;
+				}
+				//Read entries from file after data is loaded
+				//LookupEntries::ReadEntriesFromFile();
+				//LookupConfigs::ReadConfigsFromFile();
+				Utility::TimeFunction("ReadConfigs", LookupConfigs::ReadConfigsFromFile);
+				Utility::TimeFunction("ReadEntries", LookupEntries::ReadEntriesFromFile);
+
+				bLoadedConfigs = true;
+			}
+			else if (type == sCurrentEntries) {
+				if (!bLoadedConfigs) {
+					logger::critical("Failed to read sUsedEntries data from cosave");
+					return;
+				}
+				if (!DataManager::LoadCurrentEntries(a_intfc)) {
+					logger::critical("Failed to read sCurrentEntries data from cosave");
 					return;
 				}
 			}
@@ -69,12 +87,6 @@ namespace Serialisation
 
 		logger::info("Finished loading data");
 		logger::info("");
-
-		//Read entries from file after data is loaded
-		//LookupEntries::ReadEntriesFromFile();
-		//LookupConfigs::ReadConfigsFromFile();
-		Utility::TimeFunction("ReadConfigs", LookupConfigs::ReadConfigsFromFile);
-		Utility::TimeFunction("ReadEntries", LookupEntries::ReadEntriesFromFile);
 	}
 
 	void Manager::OnRevert(SKSE::SerializationInterface*)
