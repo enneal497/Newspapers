@@ -6,7 +6,6 @@ namespace LookupConfigs
 {
 	void ReadConfigsFromFile()
 	{
-		//TODO - causes CTD if configDir is changed
 		if (std::error_code ec; !std::filesystem::exists(DataManager::configDir, ec)) {
 			std::string error_message = ec.message();
 			std::string pathStr = DataManager::configDir.string();
@@ -17,7 +16,7 @@ namespace LookupConfigs
 		std::string buffer;
 		std::vector<configFormat> tmp_configs;
 
-		for (const auto& entry : std::filesystem::directory_iterator(dir)) {
+		for (const auto& entry : std::filesystem::directory_iterator(DataManager::configDir)) {
 			if (entry.path().extension() != ".json"sv) {
 				continue;
 			}
