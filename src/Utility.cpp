@@ -95,4 +95,21 @@ namespace Utility
         );
     }
 
+    //Dispatch
+    void PushBookDescription(const RE::TESForm* bookForm, const std::string descriptionText)
+    {
+        static const auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
+
+        RE::BSFixedString descriptionString = descriptionText;
+
+        auto args = RE::MakeFunctionArguments(
+            std::move(bookForm),
+            std::move(descriptionString)
+        );
+        RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> resultCallback;
+
+        const auto result = vm->DispatchStaticCall("DescriptionFramework", "SetDescription", args, resultCallback);
+        logger::info("{} call to Description Framework", (result ? "Dispatched" : "Failed to dispatch"));
+    }
+
 }

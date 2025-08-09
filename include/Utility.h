@@ -40,4 +40,6 @@ namespace Utility
 	
 	//UNUSED
 	void ReplaceBookContents(const RE::TESObjectBOOK* bookPtr, const std::string& bookText);
+
+	void PushBookDescription(const RE::TESForm* bookForm, const std::string descriptionText);
 }

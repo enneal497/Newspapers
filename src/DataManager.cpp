@@ -1,5 +1,4 @@
 #include "DataManager.h"
-#include "LookupConfigs.h"
 #include "Utility.h"
 
 namespace DataManager
@@ -32,8 +31,16 @@ namespace DataManager
 		}
 		for (const auto& [key, item] : newspaperMap) {
 			//Save item
-			if (!a_intfc->WriteRecordData(key) || !a_intfc->WriteRecordData(item.currentEntry->GetFormID())) {
-				logger::error("Failed to write item {}", key);
+			//logger::info("CNAM size: {}", item.currentCNAM.size());
+			//logger::info("CNAM value: {}", item.currentCNAM);
+			if (!a_intfc->WriteRecordData(key) ||
+				!a_intfc->WriteRecordData(item.currentEntry->GetFormID())) {
+				return false;
+			}
+
+			std::size_t strSize = item.currentCNAM.length() + 1;
+			if (!a_intfc->WriteRecordData(strSize) ||
+				!a_intfc->WriteRecordData(item.currentCNAM.data(), static_cast<std::uint32_t>(strSize))) {
 				return false;
 			}
 		}
@@ -74,15 +81,31 @@ namespace DataManager
 			if (!a_intfc->ReadRecordData(&key, sizeof(key))) { return false; }
 			if (!newspaperMap.contains(key)) { continue; }
 
+			logger::info("Read key: {}", key);
+
 			RE::FormID a_bookID;
 			if (!Utility::ReadFormID(a_intfc, a_bookID)) {
 				logger::warn("Failed to resolve formID. Plugin may have been removed");
-				continue;
+				return false;
 			}
-			
+
+			logger::info("Read formID: {}", a_bookID);
+
+			std::string CNAM;
+			std::size_t strSize = 0;
+			if (!a_intfc->ReadRecordData(strSize)) { return false; }
+			logger::info("size: {}", strSize);
+			CNAM.reserve(strSize);
+			if (!a_intfc->ReadRecordData(CNAM.data(), static_cast<std::uint32_t>(strSize))) { 
+				return false; 
+			}
+			logger::info("New CNAM: {}", CNAM.data());
+
 			//Refresh entries
-			newspaperMap.at(key).PushNewEntry(a_bookID, false);
+			newspaperMap.at(key).PushNewEntry(a_bookID, false, CNAM.data());
 		}
+
+		logger::info("Read currentEntries");
 		return true;
 
 	}

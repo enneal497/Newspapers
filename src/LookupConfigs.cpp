@@ -1,6 +1,5 @@
 #include "LookupConfigs.h"
 #include "DataManager.h"
-#include "Utility.h"
 
 namespace LookupConfigs
 {

@@ -38,26 +38,28 @@ void Newspaper::UpdateContainers(RE::TESBoundObject* boundOBJ)
 }
 
 //Format and replace with new text
-void Newspaper::PushNewEntry(RE::FormID formID, bool bResetFlags)
+void Newspaper::PushNewEntry(RE::FormID formID, bool bResetFlags, std::string CNAM)
 {
 	//TODO - Log as debug and convert formID to hex
 	logger::info("Pushing new entry {}", formID);
 
-	auto bookOBJ = RE::TESForm::LookupByID<RE::TESObjectBOOK>(formID);
+	auto* const bookOBJ = RE::TESForm::LookupByID<RE::TESObjectBOOK>(formID);
 	if (bResetFlags && bookOBJ->IsRead()) {
 		bookOBJ->data.flags.reset(RE::OBJ_BOOK::Flag::kHasBeenRead);
 		bookOBJ->RemoveChange(RE::TESObjectBOOK::ChangeFlags::kRead);
 	}
-	/*
-	static const auto calendar = RE::Calendar::GetSingleton();
-	const auto dateStr = std::format("{}, {} {}, {}", 
-		calendar->GetDayName(), calendar->GetDay(), calendar->GetMonthName(), calendar->GetYear()
-	);
-	const auto nameStr = newspaperName + " - " + dateStr;
-
-	bookOBJ->SetFullName(nameStr.c_str());
-	*/
-
+	
+	if (CNAM == "") {
+		static auto calendar = RE::Calendar::GetSingleton();
+		currentCNAM = std::format("{}, {} {}, {}",
+			calendar->GetDayName(), calendar->GetDay(), calendar->GetMonthName(), calendar->GetYear()
+		);
+	}
+	else {
+		currentCNAM = CNAM;
+	}
+	Utility::PushBookDescription(bookOBJ, currentCNAM);
+	
 	auto boundOBJ = bookOBJ->As<RE::TESBoundObject>();
 	UpdateContainers(boundOBJ);
 
@@ -84,7 +86,9 @@ void Newspaper::UpdateEntry()
 
 	//No valid conditioned entries found
 	if (genericEntries.empty()) { return; }
-	size_t index = clib_util::RNG().generate<std::size_t>(0, genericEntries.size() - 1);
+
+	static auto rng = clib_util::RNG();
+	size_t index = rng.generate<std::size_t>(0, genericEntries.size() - 1);
 	logger::info("Got object at index {} of {}", index, genericEntries.size() - 1);
 
 	const auto& gEntry = genericEntries.at(index);

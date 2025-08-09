@@ -9,7 +9,7 @@ public:
 	Newspaper(std::string tmp_name, float tmp_updateInterval)
 		: updateInterval(tmp_updateInterval),
 		newspaperName(tmp_name),
-		currentEntry(nullptr) {
+		currentEntry(nullptr), currentCNAM("") {
 	}
 
 	float updateInterval;
@@ -35,11 +35,12 @@ public:
 	std::vector<conditionedEntry> conditionedEntries;
 
 	RE::TESBoundObject* currentEntry;
+	std::string currentCNAM;
 	std::vector<RE::TESContainer*> containerPtrs;
 
 	void ResolveContainers(const std::vector<std::string> containerIDs);
 	void UpdateContainers(RE::TESBoundObject* boundOBJ);
-	void PushNewEntry(RE::FormID formID, bool bResetFlags);
+	void PushNewEntry(RE::FormID formID, bool bResetFlags, std::string CNAM = "");
 	void UpdateEntry();
 
 };
