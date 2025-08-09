@@ -34,7 +34,7 @@ namespace Serialisation
 	{
 		std::scoped_lock<std::shared_mutex> locker(_lock);
 
-		logger::debug("Saving data ...");
+		logger::info("Saving data ...");
 		if (!a_intfc->OpenRecord(sUsedEntries, sVersion) || !DataManager::SaveUsedEntries(a_intfc)) {
 			logger::critical("Unable to open record sUsedEntries to write cosave data");
 			return;
@@ -43,8 +43,8 @@ namespace Serialisation
 			logger::critical("Failed to save sCurrentEntries data to cosave");
 			return;
 		}
-		logger::debug("Finished saving data");
-		logger::debug("");
+		logger::info("Finished saving data");
+		logger::info("");
 	}
 
 	//Load cosave data to DataManager::newspaperMap
@@ -76,10 +76,12 @@ namespace Serialisation
 			else if (type == sCurrentEntries) {
 				if (!bLoadedConfigs) {
 					logger::critical("Failed to read sUsedEntries data from cosave");
+					logger::info("");
 					return;
 				}
 				if (!DataManager::LoadCurrentEntries(a_intfc)) {
 					logger::critical("Failed to read sCurrentEntries data from cosave");
+					logger::info("");
 					return;
 				}
 			}
@@ -92,6 +94,8 @@ namespace Serialisation
 	void Manager::OnRevert(SKSE::SerializationInterface*)
 	{
 		std::scoped_lock<std::shared_mutex> locker(_lock);
+		logger::info("OnRevert called");
 		DataManager::newspaperMap.clear();
+		DataManager::usedEntrySet.clear();
 	}
 }

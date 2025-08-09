@@ -12,9 +12,7 @@ void Newspaper::ResolveContainers(const std::vector<std::string> containerIDs)
 			logger::warn("Skipping {} - container not found", formStr);
 			continue;
 		}
-
 		containerPtrs.push_back(container);
-
 	}
 }
 
@@ -24,15 +22,26 @@ void Newspaper::UpdateContainers(RE::TESBoundObject* boundOBJ)
 	logger::info("Pushing to {} containers", containerPtrs.size());
 	for (auto container : containerPtrs) {
 		//TODO - Move min,max to DataManager.h
-		int count = clib_util::RNG().generate<int>(1, 10);
+		static auto rng = clib_util::RNG();
+		int count = rng.generate<int>(1, 10);
 		
 		//If old item is in container, remove it
-		if (currentEntry) {
-			const auto currentCount = container->CountObjectsInContainer(currentEntry);
-			if (currentCount > 0) { container->RemoveObjectFromContainer(currentEntry, currentCount); }
+		bool bHandled = false;
+		//logger::info("# items in container: {}", container->numContainerObjects);
+		for (int i = 0; i < container->numContainerObjects; i++)
+		{
+			auto& obj = container->containerObjects[i];
+			if (obj->obj == boundOBJ) {
+				logger::info("Entry is already in container");
+				obj->count = count;
+				bHandled = true;
+				break;
+			}
 		}
 
-		container->AddObjectToContainer(boundOBJ, count, nullptr);
+		if (!bHandled) {
+			container->AddObjectToContainer(boundOBJ, count, nullptr);
+		}
 	}
 
 }

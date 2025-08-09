@@ -6,6 +6,7 @@ namespace DataManager
 	//Save set of used entry hashes
 	bool SaveUsedEntries(SKSE::SerializationInterface* a_intfc)
 	{
+		logger::info("Saving used entries");
 		const std::size_t setSize = usedEntrySet.size();
 		if (!a_intfc->WriteRecordData(setSize)) {
 			logger::error("Failed to save set size");
@@ -18,32 +19,40 @@ namespace DataManager
 				return false;
 			}
 		}
+		logger::info("Saved used entries");
 		return true;
 	}
 
 	//Save set of current entries
 	bool SaveCurrentEntries(SKSE::SerializationInterface* a_intfc)
 	{
+		logger::info("Saving current entries");
 		const std::size_t mapSize = newspaperMap.size();
 		if (!a_intfc->WriteRecordData(mapSize)) {
 			logger::error("Failed to save map size");
 			return false;
 		}
+		//logger::info("Saved mapsize");
 		for (const auto& [key, item] : newspaperMap) {
 			//Save item
-			//logger::info("CNAM size: {}", item.currentCNAM.size());
-			//logger::info("CNAM value: {}", item.currentCNAM);
+			if (!item.currentEntry) {
+				logger::error("currentEntry not found");
+				return false;
+			}
+
 			if (!a_intfc->WriteRecordData(key) ||
 				!a_intfc->WriteRecordData(item.currentEntry->GetFormID())) {
 				return false;
 			}
 
 			std::size_t strSize = item.currentCNAM.length() + 1;
+			logger::info("strSize: {}", strSize);
 			if (!a_intfc->WriteRecordData(strSize) ||
 				!a_intfc->WriteRecordData(item.currentCNAM.data(), static_cast<std::uint32_t>(strSize))) {
 				return false;
 			}
 		}
+		logger::info("Saved current entries");
 		return true;
 	}
 
@@ -81,28 +90,27 @@ namespace DataManager
 			if (!a_intfc->ReadRecordData(&key, sizeof(key))) { return false; }
 			if (!newspaperMap.contains(key)) { continue; }
 
-			logger::info("Read key: {}", key);
-
 			RE::FormID a_bookID;
 			if (!Utility::ReadFormID(a_intfc, a_bookID)) {
 				logger::warn("Failed to resolve formID. Plugin may have been removed");
 				return false;
 			}
-
-			logger::info("Read formID: {}", a_bookID);
+			//logger::info("Read formID: {}", a_bookID);
 
 			std::string CNAM;
 			std::size_t strSize = 0;
 			if (!a_intfc->ReadRecordData(strSize)) { return false; }
-			logger::info("size: {}", strSize);
 			CNAM.reserve(strSize);
 			if (!a_intfc->ReadRecordData(CNAM.data(), static_cast<std::uint32_t>(strSize))) { 
 				return false; 
 			}
-			logger::info("New CNAM: {}", CNAM.data());
+			//logger::info("New CNAM: {}", CNAM.data());
 
 			//Refresh entries
-			newspaperMap.at(key).PushNewEntry(a_bookID, false, CNAM.data());
+			auto* const boundOBJ = RE::TESForm::LookupByID<RE::TESBoundObject>(a_bookID);
+			auto& newspaper = newspaperMap.at(key);
+			newspaper.currentEntry = boundOBJ;
+			newspaper.PushNewEntry(a_bookID, false, CNAM.data());
 		}
 
 		logger::info("Read currentEntries");

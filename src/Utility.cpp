@@ -53,7 +53,7 @@ namespace Utility
     //Evaluate all entry conditions
     bool TestConditions(const Newspaper::conditionedEntry& cEntry)
     {
-        logger::info("Testing entry: '{}'", cEntry.formID);
+        //logger::info("Testing entry: '{}'", cEntry.formID);
         const int CWAllegiance = GetCWAllegiance();
 
         //Test player allegiance
