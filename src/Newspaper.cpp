@@ -28,7 +28,7 @@ void Newspaper::UpdateContainers(RE::TESBoundObject* boundOBJ)
 		//If old item is in container, remove it
 		bool bHandled = false;
 		//logger::info("# items in container: {}", container->numContainerObjects);
-		for (int i = 0; i < container->numContainerObjects; i++)
+		for (uint32_t i = 0; i < container->numContainerObjects; i++)
 		{
 			auto& obj = container->containerObjects[i];
 			if (obj->obj == boundOBJ) {

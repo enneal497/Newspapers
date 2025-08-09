@@ -87,6 +87,13 @@ namespace Serialisation
 			}
 		}
 
+		if (!bLoadedConfigs) {
+			logger::info("No data found - loading from disk");
+			LookupConfigs::ReadConfigsFromFile();
+			LookupEntries::ReadEntriesFromFile();
+			DataManager::UpdateAllEntries(true);
+		}
+
 		logger::info("Finished loading data");
 		logger::info("");
 	}
