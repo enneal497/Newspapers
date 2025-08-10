@@ -10,8 +10,8 @@ namespace DataManager {
 
 	bool SaveUsedEntries(SKSE::SerializationInterface* a_intfc);
 	bool LoadUsedEntries(SKSE::SerializationInterface* a_intfc);
-	bool SaveCurrentEntries(SKSE::SerializationInterface* a_intfc);
-	bool LoadCurrentEntries(SKSE::SerializationInterface* a_intfc);
+	bool SaveConfigData(SKSE::SerializationInterface* a_intfc);
+	bool LoadConfigData(SKSE::SerializationInterface* a_intfc);
 
 	void UpdateAllEntries(bool bForceUpdate = false);
 }

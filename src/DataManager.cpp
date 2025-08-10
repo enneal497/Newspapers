@@ -23,8 +23,8 @@ namespace DataManager
 		return true;
 	}
 
-	//Save set of current entries
-	bool SaveCurrentEntries(SKSE::SerializationInterface* a_intfc)
+	//Save set of current entries and lastUpdatedDay
+	bool SaveConfigData(SKSE::SerializationInterface* a_intfc)
 	{
 		logger::info("Saving current entries");
 		const std::size_t mapSize = newspaperMap.size();
@@ -32,7 +32,7 @@ namespace DataManager
 			logger::error("Failed to save map size");
 			return false;
 		}
-		//logger::info("Saved mapsize");
+		logger::info("Saved mapsize");
 		for (const auto& [key, item] : newspaperMap) {
 			//Save item
 			if (!item.currentEntry) {
@@ -45,10 +45,16 @@ namespace DataManager
 				return false;
 			}
 
+			//Save book description
 			std::size_t strSize = item.currentCNAM.length() + 1;
 			logger::info("strSize: {}", strSize);
 			if (!a_intfc->WriteRecordData(strSize) ||
 				!a_intfc->WriteRecordData(item.currentCNAM.data(), static_cast<std::uint32_t>(strSize))) {
+				return false;
+			}
+
+			//Save lastUpdatedDay
+			if (!a_intfc->WriteRecordData(item.lastUpdatedDay)) {
 				return false;
 			}
 		}
@@ -78,25 +84,32 @@ namespace DataManager
 	}
 
 	//Update newspapers to their previous entries
-	bool LoadCurrentEntries(SKSE::SerializationInterface* a_intfc)
+	bool LoadConfigData(SKSE::SerializationInterface* a_intfc)
 	{
 		std::size_t mapSize;
 		a_intfc->ReadRecordData(&mapSize, sizeof(mapSize));
 		logger::info("currentEntryMap size: {}", mapSize);
 
 		if (mapSize == 0) { return true; }
-		for (; mapSize > 0; --mapSize) {
+		for (; mapSize > 0; --mapSize) {	
+			bool bExistsInMap = true;
+			//Load currentEntry
 			std::string key;
 			if (!a_intfc->ReadRecordData(&key, sizeof(key))) { return false; }
-			if (!newspaperMap.contains(key)) { continue; }
+			logger::info("Key: {}", key);
+			if (!newspaperMap.contains(key)) {
+				//Skip remaining data;
+				bExistsInMap = false;
+			}
 
 			RE::FormID a_bookID;
 			if (!Utility::ReadFormID(a_intfc, a_bookID)) {
 				logger::warn("Failed to resolve formID. Plugin may have been removed");
 				return false;
 			}
-			//logger::info("Read formID: {}", a_bookID);
+			logger::info("Read formID: {}", a_bookID);
 
+			//Load book description
 			std::string CNAM;
 			std::size_t strSize = 0;
 			if (!a_intfc->ReadRecordData(strSize)) { return false; }
@@ -104,13 +117,21 @@ namespace DataManager
 			if (!a_intfc->ReadRecordData(CNAM.data(), static_cast<std::uint32_t>(strSize))) { 
 				return false; 
 			}
-			//logger::info("New CNAM: {}", CNAM.data());
+
+			//Load lastUpdatedDay
+			logger::info("Reading lastUpdatedDay");
+			int32_t lastUpdatedDay;
+			if (!a_intfc->ReadRecordData(&lastUpdatedDay, sizeof(lastUpdatedDay))) { return false; }
+			logger::info("Read lastUpdatedDay: {}", lastUpdatedDay);
 
 			//Refresh entries
-			auto* const boundOBJ = RE::TESForm::LookupByID<RE::TESBoundObject>(a_bookID);
-			auto& newspaper = newspaperMap.at(key);
-			newspaper.currentEntry = boundOBJ;
-			newspaper.PushNewEntry(a_bookID, false, CNAM.data());
+			if (bExistsInMap) {
+				auto* const boundOBJ = RE::TESForm::LookupByID<RE::TESBoundObject>(a_bookID);
+				auto& newspaper = newspaperMap.at(key);
+				newspaper.currentEntry = boundOBJ;
+				newspaper.lastUpdatedDay = lastUpdatedDay;
+				newspaper.PushNewEntry(a_bookID, false, CNAM.data());
+			}
 		}
 
 		logger::info("Read currentEntries");
@@ -121,7 +142,7 @@ namespace DataManager
 	//Iterate through newspapers and update if required
 	void UpdateAllEntries(bool bForceUpdate)
 	{
-		const auto daysPassed = RE::Calendar::GetSingleton()->GetDaysPassed();
+		const auto daysPassed = static_cast<int32_t>(RE::Calendar::GetSingleton()->GetDaysPassed());
 		logger::info("daysPassed: {}", daysPassed);
 
 		for (auto& [key, newspaper] : newspaperMap) {

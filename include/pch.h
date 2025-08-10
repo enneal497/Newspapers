@@ -10,6 +10,7 @@
 
 #include <unordered_set>
 #include <shared_mutex>
+#include <cstdint>
 
 using namespace std::literals;
 

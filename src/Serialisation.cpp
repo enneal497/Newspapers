@@ -36,11 +36,11 @@ namespace Serialisation
 
 		logger::info("Saving data ...");
 		if (!a_intfc->OpenRecord(sUsedEntries, sVersion) || !DataManager::SaveUsedEntries(a_intfc)) {
-			logger::critical("Unable to open record sUsedEntries to write cosave data");
+			logger::critical("Failed to save sUsedEntries data to cosave");
 			return;
 		}
-		if (!a_intfc->OpenRecord(sCurrentEntries, sVersion) || !DataManager::SaveCurrentEntries(a_intfc)) {
-			logger::critical("Failed to save sCurrentEntries data to cosave");
+		if (!a_intfc->OpenRecord(sConfigs, sVersion) || !DataManager::SaveConfigData(a_intfc)) {
+			logger::critical("Failed to save sConfigs data to cosave");
 			return;
 		}
 		logger::info("Finished saving data");
@@ -73,20 +73,21 @@ namespace Serialisation
 
 				bLoadedConfigs = true;
 			}
-			else if (type == sCurrentEntries) {
+			else if (type == sConfigs) {
 				if (!bLoadedConfigs) {
 					logger::critical("Failed to read sUsedEntries data from cosave");
 					logger::info("");
 					return;
 				}
-				if (!DataManager::LoadCurrentEntries(a_intfc)) {
-					logger::critical("Failed to read sCurrentEntries data from cosave");
+				if (!DataManager::LoadConfigData(a_intfc)) {
+					logger::critical("Failed to read sConfigs data from cosave");
 					logger::info("");
 					return;
 				}
 			}
 		}
 
+		//Installation mid-game
 		if (!bLoadedConfigs) {
 			logger::info("No data found - loading from disk");
 			LookupConfigs::ReadConfigsFromFile();

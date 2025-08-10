@@ -30,7 +30,7 @@ namespace Serialisation
 
 	const unsigned long sUID = _byteswap_ulong('SNWS');
 	const unsigned long sUsedEntries = _byteswap_ulong('USED');
-	const unsigned long sCurrentEntries = _byteswap_ulong('CRNT');
+	const unsigned long sConfigs = _byteswap_ulong('CNFG');
 	const unsigned long sVersion = 1;
 
 	void InitialiseSerialisation();
