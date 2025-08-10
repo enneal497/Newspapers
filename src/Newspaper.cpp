@@ -2,8 +2,6 @@
 #include "DataManager.h"
 #include "Utility.h"
 
-
-
 void Newspaper::ResolveContainers(const std::vector<std::string> containerIDs)
 {
 	for (auto formStr : containerIDs) {

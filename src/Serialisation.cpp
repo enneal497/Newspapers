@@ -68,8 +68,8 @@ namespace Serialisation
 				//Read entries from file after data is loaded
 				//LookupEntries::ReadEntriesFromFile();
 				//LookupConfigs::ReadConfigsFromFile();
-				Utility::TimeFunction("ReadConfigs", LookupConfigs::ReadConfigsFromFile);
-				Utility::TimeFunction("ReadEntries", LookupEntries::ReadEntriesFromFile);
+				Utility::TimeFunction(1, "ReadConfigs", LookupConfigs::ReadConfigsFromFile);
+				Utility::TimeFunction(1, "ReadEntries", LookupEntries::ReadEntriesFromFile);
 
 				bLoadedConfigs = true;
 			}

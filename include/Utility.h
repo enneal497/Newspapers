@@ -4,13 +4,15 @@
 namespace Utility
 {
 	template<typename Func, typename... Args>
-	void TimeFunction(const std::string& funcName, Func func, Args&&... args) {
+	void TimeFunction(int nTimes, const std::string& funcName, Func func, Args&&... args) {
 		clib_util::Timer timer;
-		timer.start();
-		func(std::forward<Args>(args)...);
-		timer.end();
-		const auto runtime_us = timer.duration_us();
-		logger::info("{} ran in {} microseconds", funcName, runtime_us);
+		for (; nTimes > 0; nTimes--) {
+			timer.start();
+			func(std::forward<Args>(args)...);
+			timer.end();
+			const auto runtime_us = timer.duration_us();
+			logger::info("{} ran in {} microseconds", funcName, runtime_us);
+		}
 		logger::info("");
 	}
 

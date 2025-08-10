@@ -16,11 +16,11 @@ void Listener(SKSE::MessagingInterface::Message* message) noexcept
     case SKSE::MessagingInterface::kNewGame:
         //Only load configs on new game
         //LookupConfigs::ReadConfigsFromFile();
-        Utility::TimeFunction("ReadConfigs", LookupConfigs::ReadConfigsFromFile);
+        Utility::TimeFunction(1, "ReadConfigs", LookupConfigs::ReadConfigsFromFile);
         //LookupEntries::ReadEntriesFromFile();
-        Utility::TimeFunction("ReadEntries", LookupEntries::ReadEntriesFromFile);
+        Utility::TimeFunction(1, "ReadEntries", LookupEntries::ReadEntriesFromFile);
         //DataManager::UpdateAllEntries(true);
-        Utility::TimeFunction("UpdateAllEntries", DataManager::UpdateAllEntries, true);
+        Utility::TimeFunction(1, "UpdateAllEntries", DataManager::UpdateAllEntries, true);
 
         break;
     }

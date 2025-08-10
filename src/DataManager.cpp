@@ -9,15 +9,11 @@ namespace DataManager
 		logger::info("Saving used entries");
 		const std::size_t setSize = usedEntrySet.size();
 		if (!a_intfc->WriteRecordData(setSize)) {
-			logger::error("Failed to save set size");
 			return false;
 		}
-		for (const auto& item : usedEntrySet) {
-			//Save item
-			if (!a_intfc->WriteRecordData(item)) {
-				logger::error("Failed to write formID {}", item);
-				return false;
-			}
+		std::vector<RE::FormID> ids(usedEntrySet.begin(), usedEntrySet.end());
+		if (!a_intfc->WriteRecordData(ids)) {
+			return false;
 		}
 		logger::info("Saved used entries");
 		return true;
@@ -29,10 +25,9 @@ namespace DataManager
 		logger::info("Saving current entries");
 		const std::size_t mapSize = newspaperMap.size();
 		if (!a_intfc->WriteRecordData(mapSize)) {
-			logger::error("Failed to save map size");
 			return false;
 		}
-		logger::info("Saved mapsize");
+
 		for (const auto& [key, item] : newspaperMap) {
 			//Save item
 			if (!item.currentEntry) {
@@ -40,14 +35,15 @@ namespace DataManager
 				return false;
 			}
 
-			if (!a_intfc->WriteRecordData(key) ||
+			std::size_t keySize = key.size();
+			if (!a_intfc->WriteRecordData(keySize) ||
+				!a_intfc->WriteRecordData(key.data(), static_cast<std::uint32_t>(keySize)) ||
 				!a_intfc->WriteRecordData(item.currentEntry->GetFormID())) {
 				return false;
 			}
 
 			//Save book description
-			std::size_t strSize = item.currentCNAM.length() + 1;
-			logger::info("strSize: {}", strSize);
+			std::size_t strSize = item.currentCNAM.size();
 			if (!a_intfc->WriteRecordData(strSize) ||
 				!a_intfc->WriteRecordData(item.currentCNAM.data(), static_cast<std::uint32_t>(strSize))) {
 				return false;
@@ -71,6 +67,7 @@ namespace DataManager
 		logger::info("usedEntrySet size: {}", setSize);
 		
 		if (setSize == 0) { return true; }
+		usedEntrySet.reserve(setSize);
 		for (; setSize > 0; --setSize) {
 			RE::FormID a_bookID;
 			if (!Utility::ReadFormID(a_intfc, a_bookID)) {
@@ -91,16 +88,16 @@ namespace DataManager
 		logger::info("currentEntryMap size: {}", mapSize);
 
 		if (mapSize == 0) { return true; }
-		for (; mapSize > 0; --mapSize) {	
-			bool bExistsInMap = true;
-			//Load currentEntry
+		for (; mapSize > 0; --mapSize) {
+			//Load current entry
+			std::size_t keySize = 0;
+			if (!a_intfc->ReadRecordData(&keySize, sizeof(keySize))) { return false; }
 			std::string key;
-			if (!a_intfc->ReadRecordData(&key, sizeof(key))) { return false; }
+			key.resize(keySize);
+			if (!a_intfc->ReadRecordData(key.data(), static_cast<std::uint32_t>(keySize))) { return false; }
 			logger::info("Key: {}", key);
-			if (!newspaperMap.contains(key)) {
-				//Skip remaining data;
-				bExistsInMap = false;
-			}
+
+			bool bExistsInMap = newspaperMap.contains(key);
 
 			RE::FormID a_bookID;
 			if (!Utility::ReadFormID(a_intfc, a_bookID)) {
@@ -110,16 +107,15 @@ namespace DataManager
 			logger::info("Read formID: {}", a_bookID);
 
 			//Load book description
-			std::string CNAM;
 			std::size_t strSize = 0;
 			if (!a_intfc->ReadRecordData(strSize)) { return false; }
-			CNAM.reserve(strSize);
+			std::string CNAM;
+			CNAM.resize(strSize);
 			if (!a_intfc->ReadRecordData(CNAM.data(), static_cast<std::uint32_t>(strSize))) { 
 				return false; 
 			}
 
 			//Load lastUpdatedDay
-			logger::info("Reading lastUpdatedDay");
 			int32_t lastUpdatedDay;
 			if (!a_intfc->ReadRecordData(&lastUpdatedDay, sizeof(lastUpdatedDay))) { return false; }
 			logger::info("Read lastUpdatedDay: {}", lastUpdatedDay);
