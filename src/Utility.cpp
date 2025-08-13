@@ -58,7 +58,6 @@ namespace Utility
 
         //Test player allegiance
         if (cEntry.playerAllegiance && cEntry.playerAllegiance.value() != CWAllegiance) {
-            //logger::info("player allegiance {} doesn't match actual {}", cEntry.playerAllegiance.value(), CWAllegiance);
             return false;
         }
 
@@ -109,7 +108,7 @@ namespace Utility
         RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> resultCallback;
 
         const auto result = vm->DispatchStaticCall("DescriptionFramework", "SetDescription", args, resultCallback);
-        logger::info("{} call to Description Framework", (result ? "Dispatched" : "Failed to dispatch"));
+        logger::debug("{} call to Description Framework", (result ? "Dispatched" : "Failed to dispatch"));
     }
 
 }

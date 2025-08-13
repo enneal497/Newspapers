@@ -13,7 +13,7 @@ public:
 	}
 
 	float updateInterval;
-	int32_t lastUpdatedDay = 0;
+	int32_t lastUpdatedDay = -1;
 
 	struct conditionFormat {
 		RE::FormID formID;

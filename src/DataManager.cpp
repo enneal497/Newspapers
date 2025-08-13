@@ -61,23 +61,22 @@ namespace DataManager
 	//Load set of used entry formIDs
 	bool LoadUsedEntries(SKSE::SerializationInterface* a_intfc)
 	{
-		std::size_t setSize;
-		a_intfc->ReadRecordData(&setSize, sizeof(setSize));
-		usedEntrySet.clear();
-		logger::info("usedEntrySet size: {}", setSize);
-		
-		if (setSize == 0) { return true; }
-		usedEntrySet.reserve(setSize);
-		for (; setSize > 0; --setSize) {
-			RE::FormID a_bookID;
-			if (!Utility::ReadFormID(a_intfc, a_bookID)) {
+		std::size_t vecSize;
+		a_intfc->ReadRecordData(&vecSize, sizeof(vecSize));
+		logger::info("usedEntrySet size: {}", vecSize);
+
+		std::vector<RE::FormID> formIDs;
+		formIDs.resize(vecSize);
+		a_intfc->ReadRecordData(formIDs);
+		for (auto& formID : formIDs) {
+			if (formID == 0 || !a_intfc->ResolveFormID(formID, formID)) {
 				logger::warn("Failed to resolve formID. Plugin may have been removed");
 				continue;
 			}
-			usedEntrySet.insert(a_bookID);
+			usedEntrySet.insert(formID);
 		}
-		return true;
 
+		return true;
 	}
 
 	//Update newspapers to their previous entries
